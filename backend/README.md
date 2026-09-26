@@ -95,3 +95,91 @@ tests/api.test.js        end-to-end tests
 
 Stock changes run inside database transactions with row locks, so two people validating at the same time
 can never push stock below zero (covered by a test).
+
+### ER diagram
+
+```mermaid
+erDiagram
+  users ||--o{ password_reset_otps : "resets password with"
+  users ||--o{ operations : "is responsible for"
+  warehouses ||--|{ locations : contains
+  warehouses ||--o{ operations : "owns"
+  warehouses ||--o{ reorder_rules : "has"
+  categories ||--o{ products : groups
+  products ||--o{ stock_quants : "is stored as"
+  locations ||--o{ stock_quants : holds
+  products ||--o{ reorder_rules : "has"
+  operations ||--|{ operation_lines : "has lines"
+  products ||--o{ operation_lines : "appears in"
+  operations ||--o{ stock_moves : "creates"
+  products ||--o{ stock_moves : "is moved in"
+  locations ||--o{ stock_moves : "from / to"
+
+  users {
+    int id PK
+    string email UK
+    string role "manager or staff"
+  }
+  warehouses {
+    int id PK
+    string code UK "e.g. WH"
+  }
+  locations {
+    int id PK
+    int warehouse_id FK
+    string code "e.g. RACK-A"
+  }
+  categories {
+    int id PK
+    string name UK
+  }
+  products {
+    int id PK
+    string sku UK
+    int category_id FK
+    string uom
+  }
+  stock_quants {
+    int product_id PK
+    int location_id PK
+    numeric quantity "never negative"
+  }
+  reorder_rules {
+    int id PK
+    int product_id FK
+    int warehouse_id FK
+    numeric min_qty
+    numeric max_qty
+  }
+  operations {
+    int id PK
+    string reference UK "e.g. WH/IN/0001"
+    string type "receipt, delivery, internal, adjustment"
+    string status "draft, waiting, ready, done, canceled"
+    int source_location_id FK
+    int dest_location_id FK
+  }
+  operation_lines {
+    int id PK
+    int operation_id FK
+    int product_id FK
+    numeric quantity
+  }
+  stock_moves {
+    int id PK
+    int operation_id FK
+    int product_id FK
+    int from_location_id FK
+    int to_location_id FK
+    numeric quantity
+  }
+```
+
+How the example from the problem statement is stored:
+
+| Step | `operations` | `stock_moves` (ledger) | `stock_quants` after |
+|---|---|---|---|
+| Receive 100 kg steel | `WH/IN/0001` receipt, done | Vendor → WH/STOCK, 100 | WH/STOCK 100 |
+| Move to production rack | `WH/INT/0001` internal, done | WH/STOCK → WH/PROD, 40 | WH/STOCK 60, WH/PROD 40 |
+| Deliver 20 | `WH/OUT/0002` delivery, done | WH/STOCK → Customer, 20 | WH/STOCK 40 |
+| 3 kg damaged | `WH/ADJ/0001` adjustment, done | WH/STOCK → Adjustment, 3 | WH/STOCK 37 |

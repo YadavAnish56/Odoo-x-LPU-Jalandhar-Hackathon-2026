@@ -5,211 +5,256 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <title>StockSense — Inventory Management System</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
-  <meta name="description" content="StockSense: Know your stock. Control every movement. A premium inventory management system for warehouse operations, stock tracking, and logistics."/>
+  <meta name="description" content="StockSense: inventory management for receipts, deliveries, internal transfers, stock adjustments and a complete stock ledger."/>
+  <script>
+    // Apply the saved (or system) theme before anything is drawn, so dark mode never flashes white.
+    (function () {
+      try {
+        var theme = localStorage.getItem('stocksense_theme');
+        if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark');
+        }
+      } catch (e) {}
+    })();
+  </script>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet"/>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    tailwind.config={darkMode:"class",theme:{extend:{colors:{secondary:"#5f5e5e","surface-variant":"#e3e2e2","on-background":"#1b1c1c",surface:"#fbf9f9","primary-container":"#f97316",outline:"#8c7164","on-secondary-fixed":"#1c1b1b","inverse-on-surface":"#f2f0f0",error:"#ba1a1a",primary:"#9d4300",background:"#fbf9f9","surface-container-lowest":"#ffffff","surface-container":"#efeded","tertiary-container":"#a49890","on-surface-variant":"#584237","error-container":"#ffdad6","outline-variant":"#e0c0b1","on-error":"#ffffff","surface-container-highest":"#e3e2e2","surface-tint":"#9d4300","inverse-primary":"#ffb690","on-secondary-container":"#636262","primary-fixed-dim":"#ffb690","surface-dim":"#dbdad9","on-secondary-fixed-variant":"#474746","on-tertiary-fixed-variant":"#4e453f","on-tertiary":"#ffffff",tertiary:"#665d56","on-primary-fixed-variant":"#783200","inverse-surface":"#303031","on-primary-fixed":"#341100","tertiary-fixed":"#ede0d7","secondary-fixed-dim":"#c8c6c5","surface-container-low":"#f5f3f3","surface-container-high":"#e9e8e7","on-primary":"#ffffff","tertiary-fixed-dim":"#d1c4bc","primary-fixed":"#ffdbca","on-primary-container":"#582200","on-error-container":"#93000a","on-tertiary-container":"#38312b","on-surface":"#1b1c1c","on-tertiary-fixed":"#211a15","on-secondary":"#ffffff","secondary-container":"#e2dfde","secondary-fixed":"#e5e2e1","surface-bright":"#fbf9f9"},borderRadius:{DEFAULT:"0.25rem",lg:"0.5rem",xl:"0.75rem",full:"9999px"},spacing:{"space-sm":"0.5rem","space-md":"1rem","space-xs":"0.25rem","space-xl":"2.5rem","gutter-mobile":"1rem",margin:"2.5rem","margin-mobile":"1.25rem","space-lg":"1.5rem",gutter:"1.5rem"},fontFamily:{"body-sm":["Geist"],"headline-lg-mobile":["Geist"],"display-mobile":["Geist"],"metric-val":["Geist"],"body-md":["Geist"],"label-sm":["Geist"],"label-md":["Geist"],display:["Geist"],"headline-md":["Geist"],"headline-sm":["Geist"],"headline-lg":["Geist"],"body-lg":["Geist"]},fontSize:{"body-sm":["13px",{lineHeight:"18px",letterSpacing:"0em",fontWeight:"400"}],"headline-lg-mobile":["24px",{lineHeight:"30px",letterSpacing:"-0.02em",fontWeight:"600"}],"display-mobile":["32px",{lineHeight:"38px",letterSpacing:"-0.025em",fontWeight:"600"}],"metric-val":["36px",{lineHeight:"40px",letterSpacing:"-0.03em",fontWeight:"600"}],"body-md":["14px",{lineHeight:"20px",letterSpacing:"-0.005em",fontWeight:"400"}],"label-sm":["11px",{lineHeight:"14px",letterSpacing:"0.03em",fontWeight:"500"}],"label-md":["12px",{lineHeight:"16px",letterSpacing:"0.02em",fontWeight:"500"}],display:["48px",{lineHeight:"52px",letterSpacing:"-0.03em",fontWeight:"600"}],"headline-md":["22px",{lineHeight:"28px",letterSpacing:"-0.02em",fontWeight:"600"}],"headline-sm":["18px",{lineHeight:"24px",letterSpacing:"-0.015em",fontWeight:"500"}],"headline-lg":["32px",{lineHeight:"38px",letterSpacing:"-0.025em",fontWeight:"600"}],"body-lg":["16px",{lineHeight:"24px",letterSpacing:"-0.01em",fontWeight:"400"}]}}}}
+    // Every colour is a CSS variable (defined below for light and dark), so the whole UI follows the theme.
+    const color = (name) => `rgb(var(--${name}) / <alpha-value>)`;
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            background: color('background'),
+            'surface-container-lowest': color('card'),
+            'surface-container-low': color('muted'),
+            'surface-container': color('border'),
+            'surface-container-high': color('border-strong'),
+            'surface-container-highest': color('faint'),
+            'on-surface': color('text'),
+            secondary: color('text-muted'),
+            'primary-container': color('accent'),
+            primary: color('accent-strong'),
+            'primary-fixed': color('accent-soft'),
+            'on-primary-fixed-variant': color('accent-text'),
+            'on-primary': color('on-accent'),
+            'outline-variant': color('border-strong'),
+            error: color('danger'),
+            'error-container': color('danger-soft'),
+            success: color('success'),
+            'success-soft': color('success-soft'),
+            warning: color('warning'),
+            'warning-soft': color('warning-soft'),
+            danger: color('danger'),
+            'danger-soft': color('danger-soft'),
+            info: color('info'),
+            'info-soft': color('info-soft'),
+          },
+          fontFamily: {
+            sans: ['Geist', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+            mono: ['Geist Mono', 'ui-monospace', 'Consolas', 'monospace'],
+          },
+        },
+      },
+    };
   </script>
   <style>
-    @layer base {
-      html, body { margin: 0; padding: 0; }
-      body { overscroll-behavior: none; }
+    :root {
+      --background: 246 246 247;
+      --card: 255 255 255;
+      --muted: 244 244 245;
+      --border: 228 228 231;
+      --border-strong: 212 212 216;
+      --faint: 161 161 170;
+      --text: 24 24 27;
+      --text-muted: 113 113 122;
+      --accent: 234 88 12;
+      --accent-strong: 194 65 12;
+      --accent-soft: 255 237 213;
+      --accent-text: 154 52 18;
+      --on-accent: 255 255 255;
+      --success: 21 128 61;
+      --success-soft: 220 252 231;
+      --warning: 180 83 9;
+      --warning-soft: 254 243 199;
+      --danger: 185 28 28;
+      --danger-soft: 254 226 226;
+      --info: 29 78 216;
+      --info-soft: 219 234 254;
     }
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #d4d4d4; border-radius: 8px; }
-    ::-webkit-scrollbar-thumb:hover { background: #a3a3a3; }
+    .dark {
+      color-scheme: dark;
+      --background: 9 9 11;
+      --card: 24 24 27;
+      --muted: 32 32 36;
+      --border: 39 39 42;
+      --border-strong: 63 63 70;
+      --faint: 113 113 122;
+      --text: 244 244 245;
+      --text-muted: 161 161 170;
+      --accent: 234 88 12;
+      --accent-strong: 251 146 60;
+      --accent-soft: 67 20 7;
+      --accent-text: 253 186 116;
+      --on-accent: 255 255 255;
+      --success: 74 222 128;
+      --success-soft: 5 46 22;
+      --warning: 251 191 36;
+      --warning-soft: 69 26 3;
+      --danger: 248 113 113;
+      --danger-soft: 69 10 10;
+      --info: 96 165 250;
+      --info-soft: 23 37 84;
+    }
 
-    /* Page transition */
-    #app-content {
-      animation: fadeIn 0.25s ease-out;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    html, body { margin: 0; padding: 0; }
+    body { overscroll-behavior: none; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgb(var(--border-strong)); border-radius: 8px; }
+    .material-symbols-outlined { font-size: 20px; line-height: 1; }
 
     /* Toasts stack in the bottom-right corner */
     #toast-container {
-      position: fixed; bottom: 2rem; right: 2rem; z-index: 100;
+      position: fixed; bottom: 1.25rem; right: 1.25rem; z-index: 100;
       display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem;
       max-width: min(420px, calc(100vw - 2rem)); pointer-events: none;
     }
     .toast {
-      padding: 0.75rem 1.25rem; border-radius: 0.75rem;
-      font-size: 13px; font-weight: 500; color: white;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-      animation: slideUp 0.3s ease-out, fadeOut 0.3s ease-in 2.5s forwards;
+      padding: 0.65rem 1rem; border-radius: 0.5rem; font-size: 13px; font-weight: 500; color: white;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+      animation: slideUp 0.2s ease-out, fadeOut 0.3s ease-in 2.5s forwards;
     }
-    .toast-success { background: #16a34a; }
-    .toast-error { background: #ef4444; animation: slideUp 0.3s ease-out, fadeOut 0.3s ease-in 4.5s forwards; }
-    .toast-info { background: #3b82f6; }
-    @media (max-width: 1023px) { #toast-container { bottom: 5.5rem; right: 1rem; } }
-    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-    @keyframes fadeOut { to { opacity: 0; transform: translateY(-10px); } }
+    .toast-success { background: #15803d; }
+    .toast-error { background: #b91c1c; animation: slideUp 0.2s ease-out, fadeOut 0.3s ease-in 4.5s forwards; }
+    .toast-info { background: #1d4ed8; }
+    @keyframes slideUp { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @keyframes fadeOut { to { opacity: 0; } }
 
-    /* Modal overlay */
+    /* Modal */
     .modal-overlay {
-      position: fixed; inset: 0; z-index: 60;
-      background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
+      position: fixed; inset: 0; z-index: 60; background: rgba(0,0,0,0.45);
       display: flex; align-items: center; justify-content: center;
-      animation: fadeIn 0.2s ease-out;
     }
     .modal-content {
-      background: white; border-radius: 1.25rem; padding: 1.5rem;
-      max-width: 560px; width: 90%; max-height: 90vh; overflow-y: auto;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-      animation: scaleIn 0.25s ease-out;
+      background: rgb(var(--card)); border: 1px solid rgb(var(--border)); border-radius: 0.75rem; padding: 1.25rem;
+      max-width: 540px; width: calc(100% - 2rem); max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
     }
-    @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-    /* Skeleton loading */
     .skeleton {
-      background: linear-gradient(90deg, #efeded 25%, #e3e2e2 50%, #efeded 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.5s infinite;
-      border-radius: 0.5rem;
+      background: linear-gradient(90deg, rgb(var(--muted)) 25%, rgb(var(--border)) 50%, rgb(var(--muted)) 75%);
+      background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 0.375rem;
     }
     @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
-    /* Mobile bottom nav */
-    .mobile-nav { display: none; }
+    /* Sidebar */
+    .nav-link {
+      display: flex; align-items: center; gap: 0.7rem; padding: 0.45rem 0.7rem; border-radius: 0.375rem;
+      font-size: 14px; color: rgb(var(--text-muted));
+    }
+    .nav-link:hover { background: rgb(var(--muted)); color: rgb(var(--text)); }
+    .nav-link.active { background: rgb(var(--accent-soft)); color: rgb(var(--accent-text)); font-weight: 600; }
+    .nav-section { padding: 1.1rem 0.7rem 0.3rem; font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: rgb(var(--faint)); }
     @media (max-width: 1023px) {
-      .mobile-nav { display: flex; }
-      footer { padding-bottom: 5rem !important; }
+      #sidebar { transform: translateX(-100%); transition: transform 0.2s ease; }
+      body.sidebar-open #sidebar { transform: translateX(0); }
+      body.sidebar-open #sidebar-backdrop { display: block; }
     }
   </style>
 </head>
-<body class="bg-background font-body-md text-body-md text-on-surface antialiased min-h-screen flex flex-col">
+<body class="bg-background font-sans text-[14px] text-on-surface antialiased min-h-screen">
 
-  <!-- LOGIN SCREEN (shown before auth) -->
+  <!-- Sign in / sign up / password reset -->
   <div id="auth-screen"></div>
 
-  <!-- APP SHELL (shown after auth) -->
-  <div id="app-shell" class="hidden min-h-screen flex flex-col">
-    <!-- HEADER -->
-    <header class="fixed top-0 left-0 w-full z-50 py-space-sm px-gutter">
-      <div class="max-w-7xl mx-auto h-16 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] rounded-full px-space-lg flex items-center justify-between transition-all">
-        <div class="flex items-center gap-space-sm cursor-pointer" onclick="window.location.hash='#dashboard'">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="32" height="32" fill="none">
-            <rect width="48" height="48" rx="14" fill="#FFF1E8"/>
-            <rect x="12" y="12" width="10" height="10" rx="3.5" fill="#F97316"/>
-            <rect x="26" y="12" width="10" height="10" rx="3.5" fill="#F97316" fill-opacity="0.35"/>
-            <rect x="12" y="26" width="10" height="10" rx="3.5" fill="#F97316" fill-opacity="0.7"/>
-            <path d="M26 31C26 28.2386 28.2386 26 31 26H36V31C36 33.7614 33.7614 36 31 36C28.2386 36 26 33.7614 26 31Z" fill="#F97316"/>
-            <path d="M29 31L33 31M33 31L31 29M33 31L31 33" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <span class="font-headline-sm text-headline-sm text-on-surface font-semibold tracking-tight">StockSense</span>
-        </div>
+  <!-- Application (shown after sign in) -->
+  <div id="app-shell" class="hidden min-h-screen">
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-60 bg-surface-container-lowest border-r border-surface-container flex flex-col">
+      <a href="#dashboard" class="flex items-center gap-2.5 px-4 h-14 border-b border-surface-container shrink-0">
+        <img src="/favicon.svg" alt="" width="26" height="26"/>
+        <span class="text-[16px] font-semibold tracking-tight">StockSense</span>
+      </a>
 
-        <!-- Desktop Nav -->
-        <nav class="hidden lg:flex items-center gap-space-xs p-1 bg-surface-container-low rounded-full">
-          <a data-nav-path="dashboard" class="px-space-md py-1.5 rounded-full font-label-md text-label-md transition-colors cursor-pointer" onclick="window.location.hash='#dashboard'">Dashboard</a>
-          <a data-nav-path="products" class="px-space-md py-1.5 rounded-full font-label-md text-label-md transition-colors cursor-pointer" onclick="window.location.hash='#products'">Products</a>
-          <a data-nav-path="operations" class="px-space-md py-1.5 rounded-full font-label-md text-label-md transition-colors cursor-pointer" onclick="window.location.hash='#operations'">Operations</a>
-          <a data-nav-path="warehouses" class="px-space-md py-1.5 rounded-full font-label-md text-label-md transition-colors cursor-pointer" onclick="window.location.hash='#warehouses'">Warehouses</a>
-          <a data-nav-path="ledger" class="px-space-md py-1.5 rounded-full font-label-md text-label-md transition-colors cursor-pointer" onclick="window.location.hash='#ledger'">Ledger</a>
-          <a data-nav-path="landing" class="px-space-md py-1.5 rounded-full font-label-md text-label-md transition-colors cursor-pointer" onclick="window.location.hash='#landing'">Landing</a>
-        </nav>
+      <nav class="flex-1 overflow-y-auto px-2.5 py-2">
+        <a href="#dashboard" data-nav-path="dashboard" class="nav-link"><span class="material-symbols-outlined">space_dashboard</span>Dashboard</a>
 
-        <!-- Right Controls -->
-        <div class="flex items-center gap-space-sm">
-          <a href="/landing.html" class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-primary-fixed/50 hover:bg-primary-fixed text-primary rounded-full font-label-md text-label-md font-semibold transition-all shadow-xs" title="View Marketing Landing Page">
-            <span class="material-symbols-outlined text-[16px]">public</span>
-            <span>Landing Page</span>
-          </a>
-          <button id="search-trigger" class="hidden sm:flex items-center gap-space-sm px-space-md py-1.5 bg-surface-container-low hover:bg-surface-container hover:text-on-surface text-on-surface-variant rounded-full text-body-sm font-body-sm transition-all" type="button">
-            <span class="material-symbols-outlined text-body-lg">search</span>
-            <span>Search catalog</span>
-            <kbd class="px-1.5 py-0.5 bg-surface-container-lowest text-on-surface-variant rounded text-label-sm font-label-sm shadow-[0_1px_2px_rgba(0,0,0,0.05)]">⌘K</kbd>
-          </button>
-          <button id="notif-btn" aria-label="Low stock alerts" title="Low stock alerts" class="relative p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded-full transition-colors flex items-center justify-center" type="button">
-            <span class="material-symbols-outlined">notifications</span>
-            <span id="notif-dot" class="hidden absolute top-1 right-1 min-w-[16px] h-4 px-1 bg-primary-container text-on-primary rounded-full text-[10px] leading-4 font-semibold text-center"></span>
-          </button>
-          <div class="relative">
-            <button id="user-menu-btn" type="button" class="relative flex items-center pl-1 cursor-pointer" aria-label="Account menu">
-              <div id="user-avatar" class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary font-label-md text-label-md font-semibold"></div>
-              <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full shadow-[0_0_0_2px_#ffffff]"></span>
-            </button>
-            <div id="user-menu" class="hidden absolute right-0 top-11 w-60 bg-surface-container-lowest rounded-xl shadow-xl p-1.5 z-50">
-              <div class="px-3 py-2 border-b border-surface-container mb-1">
-                <div id="user-menu-name" class="font-body-md text-body-md text-on-surface font-semibold truncate"></div>
-                <div id="user-menu-email" class="font-label-sm text-label-sm text-secondary truncate"></div>
-                <div id="user-menu-role" class="font-label-sm text-label-sm text-primary font-semibold mt-0.5"></div>
-              </div>
-              <a href="#profile" class="flex items-center gap-2 px-3 py-2 rounded-lg font-body-sm text-body-sm text-on-surface hover:bg-surface-container-low"><span class="material-symbols-outlined text-[18px] text-secondary">person</span>My Profile</a>
-              <a href="#settings" class="flex items-center gap-2 px-3 py-2 rounded-lg font-body-sm text-body-sm text-on-surface hover:bg-surface-container-low"><span class="material-symbols-outlined text-[18px] text-secondary">settings</span>Settings</a>
-              <button id="logout-btn" type="button" class="w-full flex items-center gap-2 px-3 py-2 rounded-lg font-body-sm text-body-sm text-error hover:bg-error-container/40 text-left"><span class="material-symbols-outlined text-[18px]">logout</span>Sign Out</button>
-            </div>
+        <div class="nav-section">Operations</div>
+        <a href="#receipts" data-nav-path="receipts" class="nav-link"><span class="material-symbols-outlined">move_to_inbox</span>Receipts</a>
+        <a href="#deliveries" data-nav-path="deliveries" class="nav-link"><span class="material-symbols-outlined">local_shipping</span>Delivery Orders</a>
+        <a href="#transfers" data-nav-path="transfers" class="nav-link"><span class="material-symbols-outlined">sync_alt</span>Internal Transfers</a>
+        <a href="#adjustments" data-nav-path="adjustments" class="nav-link"><span class="material-symbols-outlined">tune</span>Inventory Adjustment</a>
+
+        <div class="nav-section">Products</div>
+        <a href="#products" data-nav-path="products" class="nav-link"><span class="material-symbols-outlined">inventory_2</span>Products</a>
+        <a href="#stock" data-nav-path="stock" class="nav-link"><span class="material-symbols-outlined">shelves</span>Stock by Location</a>
+        <a href="#categories" data-nav-path="categories" class="nav-link"><span class="material-symbols-outlined">category</span>Categories</a>
+        <a href="#reordering" data-nav-path="reordering" class="nav-link"><span class="material-symbols-outlined">autorenew</span>Reordering Rules</a>
+
+        <div class="nav-section">Reports</div>
+        <a href="#moves" data-nav-path="moves" class="nav-link"><span class="material-symbols-outlined">history</span>Move History</a>
+
+        <div class="nav-section">Settings</div>
+        <a href="#settings" data-nav-path="settings" class="nav-link"><span class="material-symbols-outlined">warehouse</span>Warehouses</a>
+      </nav>
+
+      <!-- Profile menu -->
+      <div class="border-t border-surface-container p-2.5 shrink-0">
+        <div class="flex items-center gap-2.5 px-2 py-2">
+          <div id="user-avatar" class="w-8 h-8 rounded-full bg-primary-container text-on-primary flex items-center justify-center text-[12px] font-semibold shrink-0"></div>
+          <div class="min-w-0">
+            <div id="user-name" class="text-[13px] font-semibold truncate"></div>
+            <div id="user-role" class="text-[12px] text-secondary truncate"></div>
           </div>
         </div>
+        <a href="#profile" data-nav-path="profile" class="nav-link"><span class="material-symbols-outlined">person</span>My Profile</a>
+        <button id="logout-btn" type="button" class="nav-link w-full text-left"><span class="material-symbols-outlined">logout</span>Logout</button>
       </div>
-    </header>
+    </aside>
+    <div id="sidebar-backdrop" class="hidden fixed inset-0 z-30 bg-black/40 lg:hidden"></div>
 
-    <!-- MAIN CONTENT -->
-    <main class="w-full max-w-7xl mx-auto px-gutter pt-20 flex-1">
-      <div id="app-content" class="flex flex-col w-full pb-16"></div>
-    </main>
+    <div class="lg:pl-60 min-h-screen flex flex-col">
+      <header class="sticky top-0 z-20 h-14 bg-background/85 backdrop-blur border-b border-surface-container flex items-center gap-2 px-4 sm:px-6">
+        <button id="menu-btn" type="button" class="lg:hidden p-2 -ml-2 rounded-md hover:bg-surface-container-low" aria-label="Open menu">
+          <span class="material-symbols-outlined">menu</span>
+        </button>
+        <div id="page-title" class="text-[15px] font-semibold truncate">Dashboard</div>
+        <div class="flex-1"></div>
+        <button id="search-trigger" type="button" class="hidden sm:flex items-center gap-2 w-60 h-9 px-3 rounded-md bg-surface-container-lowest border border-surface-container text-secondary hover:border-surface-container-high text-[13px]">
+          <span class="material-symbols-outlined !text-[18px]">search</span>
+          <span class="flex-1 text-left">Search SKU or product</span>
+          <kbd class="px-1.5 rounded border border-surface-container text-[11px] font-sans">Ctrl K</kbd>
+        </button>
+        <button id="search-trigger-mobile" type="button" class="sm:hidden p-2 rounded-md hover:bg-surface-container-low" aria-label="Search"><span class="material-symbols-outlined">search</span></button>
+        <button type="button" data-theme-toggle class="p-2 rounded-md hover:bg-surface-container-low" title="Dark / light mode" aria-label="Toggle dark mode">
+          <span class="material-symbols-outlined dark:hidden">dark_mode</span>
+          <span class="material-symbols-outlined hidden dark:inline">light_mode</span>
+        </button>
+        <button id="notif-btn" type="button" class="relative p-2 rounded-md hover:bg-surface-container-low" aria-label="Low stock alerts" title="Low stock alerts">
+          <span class="material-symbols-outlined">notifications</span>
+          <span id="notif-dot" class="hidden absolute top-1 right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-primary-container text-on-primary text-[10px] leading-4 font-semibold text-center"></span>
+        </button>
+      </header>
 
-    <!-- FOOTER -->
-    <footer class="w-full mt-space-xl bg-surface-container-lowest shadow-[0_-1px_8px_rgba(0,0,0,0.02)]">
-      <div class="max-w-7xl mx-auto px-gutter py-space-lg flex flex-col md:flex-row items-center justify-between gap-space-md">
-        <div class="flex flex-col sm:flex-row items-center gap-space-sm text-center sm:text-left">
-          <span class="font-headline-sm text-headline-sm text-on-surface font-semibold tracking-tight">StockSense</span>
-          <span class="hidden sm:inline text-outline-variant font-body-sm">•</span>
-          <span class="font-body-sm text-body-sm text-on-surface-variant">Know your stock. Control every movement.</span>
-        </div>
-        <div class="flex items-center gap-space-xs px-space-md py-1 bg-surface-container-low rounded-full">
-          <span id="api-status-dot" class="w-2 h-2 rounded-full bg-secondary"></span>
-          <span id="api-status" class="font-label-sm text-label-sm text-on-surface font-medium">Checking server...</span>
-        </div>
-        <div class="font-label-sm text-label-sm text-on-surface-variant">© 2026 StockSense · Odoo x LPU Hackathon</div>
-      </div>
-    </footer>
-
-    <!-- MOBILE BOTTOM NAV -->
-    <nav class="mobile-nav fixed bottom-0 left-0 w-full z-50 bg-surface-container-lowest/95 backdrop-blur-xl shadow-[0_-2px_12px_rgba(0,0,0,0.06)] items-center justify-around py-2 px-2">
-      <a data-mobile-nav-path="dashboard" class="flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-colors cursor-pointer" onclick="window.location.hash='#dashboard'">
-        <span class="material-symbols-outlined text-[22px]">dashboard</span>
-        <span class="text-[10px] font-medium">Dashboard</span>
-      </a>
-      <a data-mobile-nav-path="products" class="flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-colors cursor-pointer" onclick="window.location.hash='#products'">
-        <span class="material-symbols-outlined text-[22px]">inventory_2</span>
-        <span class="text-[10px] font-medium">Products</span>
-      </a>
-      <a data-mobile-nav-path="operations" class="flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-colors cursor-pointer" onclick="window.location.hash='#operations'">
-        <span class="material-symbols-outlined text-[22px]">swap_horiz</span>
-        <span class="text-[10px] font-medium">Operations</span>
-      </a>
-      <a data-mobile-nav-path="warehouses" class="flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-colors cursor-pointer" onclick="window.location.hash='#warehouses'">
-        <span class="material-symbols-outlined text-[22px]">warehouse</span>
-        <span class="text-[10px] font-medium">Warehouses</span>
-      </a>
-      <a data-mobile-nav-path="ledger" class="flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-colors cursor-pointer" onclick="window.location.hash='#ledger'">
-        <span class="material-symbols-outlined text-[22px]">menu_book</span>
-        <span class="text-[10px] font-medium">Ledger</span>
-      </a>
-    </nav>
-  </div>
-
-  <!-- Search Modal -->
-  <div id="search-modal" class="hidden modal-overlay" onclick="if(event.target===this)this.classList.add('hidden')">
-    <div class="modal-content !max-w-lg !p-0 overflow-hidden">
-      <div class="flex items-center gap-3 px-4 py-3 border-b border-surface-container">
-        <span class="material-symbols-outlined text-secondary">search</span>
-        <input id="search-input" type="text" class="flex-1 bg-transparent outline-none text-on-surface font-body-md text-body-md" placeholder="Search products, SKUs, operations..." autofocus/>
-        <kbd class="px-1.5 py-0.5 bg-surface-container text-secondary rounded text-label-sm font-label-sm">ESC</kbd>
-      </div>
-      <div id="search-results" class="max-h-80 overflow-y-auto p-2">
-        <div class="p-4 text-center text-secondary font-body-sm text-body-sm">Type to search across products and operations...</div>
-      </div>
+      <main id="app-content" class="flex-1 w-full max-w-7xl mx-auto p-4 sm:p-6"></main>
     </div>
   </div>
 
-  <!-- Toast container -->
+  <!-- Search -->
+  <div id="search-modal" class="hidden modal-overlay" onclick="if(event.target===this)this.classList.add('hidden')">
+    <div class="modal-content !max-w-lg !p-0 overflow-hidden self-start mt-24">
+      <div class="flex items-center gap-3 px-4 py-3 border-b border-surface-container">
+        <span class="material-symbols-outlined text-secondary">search</span>
+        <input id="search-input" type="text" class="flex-1 bg-transparent outline-none text-[15px]" placeholder="Search by SKU, product name or reference"/>
+        <kbd class="px-1.5 rounded border border-surface-container text-secondary text-[11px]">Esc</kbd>
+      </div>
+      <div id="search-results" class="max-h-96 overflow-y-auto p-2"></div>
+    </div>
+  </div>
+
   <div id="toast-container"></div>
 
   <script type="module" src="/src/main.js"></script>

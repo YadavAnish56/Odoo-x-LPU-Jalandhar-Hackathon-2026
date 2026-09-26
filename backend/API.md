@@ -8,7 +8,7 @@ Base URL (local): `http://localhost:5000/api`
   `Authorization: Bearer <token>`. The token comes from signup / login.
 - **JSON:** requests and responses use JSON with camelCase keys. Dates are ISO strings.
 - **Roles:** `manager` or `staff`. The first account ever created is a manager; later signups are staff.
-  🔒 = manager only (products, categories, warehouses, locations, reorder rules, user roles).
+  (M) = manager only (products, categories, warehouses, locations, reorder rules, user roles).
   Everyone can run operations (receipts, deliveries, transfers, adjustments).
 - **Lists with paging** accept `page` (default 1) and `limit` (default 20, max 100) and return:
   ```json
@@ -56,11 +56,14 @@ Base URL (local): `http://localhost:5000/api`
 | PUT | `/users/me` | `{ name?, email? }` | `user` |
 | PUT | `/users/me/password` | `{ currentPassword, newPassword }` | `{ message, token }` ← save the new token |
 | GET | `/users` | – | `user[]` (for "Responsible" dropdowns) |
-| PATCH | `/users/:id/role` 🔒 | `{ role: "manager" \| "staff" }` | `user` |
+| PATCH | `/users/:id/role` (M) | `{ role: "manager" \| "staff" }` | `user` |
 
 ## 3. Dashboard
 
-`GET /dashboard?warehouseId=&categoryId=` (both filters optional)
+`GET /dashboard?warehouseId=&locationId=&categoryId=` (all filters optional)
+
+With `locationId`, stock KPIs count the stock in that location (compared with the reorder rules of its
+warehouse) and the operation KPIs count operations that start or end there.
 
 ```json
 {
@@ -105,9 +108,9 @@ Base URL (local): `http://localhost:5000/api`
 | GET | `/products` | `?search=&categoryId=&warehouseId=&stockStatus=in\|low\|out&includeInactive=true&page=&limit=` | page of products |
 | GET | `/products/:id` | – | product + `stockByLocation`, `reorderRules`, `recentMoves` |
 | GET | `/products/sku/:sku` | – | same as above, exact SKU match |
-| POST | `/products` 🔒 | see below | `201 product` |
-| PUT | `/products/:id` 🔒 | any of `{ name, sku, categoryId, uom, costPrice, description, isActive }` | product |
-| DELETE | `/products/:id` 🔒 | – | `204` (archives it; history is kept) |
+| POST | `/products` (M) | see below | `201 product` |
+| PUT | `/products/:id` (M) | any of `{ name, sku, categoryId, uom, costPrice, description, isActive }` | product |
+| DELETE | `/products/:id` (M) | – | `204` (archives it; history is kept) |
 
 `search` matches the name or SKU. Create body:
 
@@ -156,9 +159,9 @@ Product object:
 |---|---|---|---|
 | GET | `/categories` | – | `[{ id, name, description, productCount }]` |
 | GET | `/categories/:id` | – | category |
-| POST | `/categories` 🔒 | `{ name, description? }` | `201 category` |
-| PUT | `/categories/:id` 🔒 | `{ name?, description? }` | category |
-| DELETE | `/categories/:id` 🔒 | – | `204` (its products become uncategorized) |
+| POST | `/categories` (M) | `{ name, description? }` | `201 category` |
+| PUT | `/categories/:id` (M) | `{ name?, description? }` | category |
+| DELETE | `/categories/:id` (M) | – | `204` (its products become uncategorized) |
 
 ## 6. Reordering rules
 
@@ -167,9 +170,9 @@ A rule says: *in this warehouse, alert me when the product drops to `minQty`, an
 | Method | Path | Body / Query | Returns |
 |---|---|---|---|
 | GET | `/reorder-rules` | `?productId=&warehouseId=&status=ok\|low\|out` | rule[] |
-| POST | `/reorder-rules` 🔒 | `{ productId, warehouseId, minQty, maxQty }` | `201 rule` (updates the rule if one already exists for that product + warehouse) |
-| PUT | `/reorder-rules/:id` 🔒 | `{ minQty?, maxQty? }` | rule |
-| DELETE | `/reorder-rules/:id` 🔒 | – | `204` |
+| POST | `/reorder-rules` (M) | `{ productId, warehouseId, minQty, maxQty }` | `201 rule` (updates the rule if one already exists for that product + warehouse) |
+| PUT | `/reorder-rules/:id` (M) | `{ minQty?, maxQty? }` | rule |
+| DELETE | `/reorder-rules/:id` (M) | – | `204` |
 
 Rule object: `{ id, productId, productName, sku, uom, warehouseId, warehouseName, warehouseCode, minQty, maxQty, onHand, status, suggestedQty }`
 (`suggestedQty` = how much to order to get back to `maxQty`).
@@ -187,10 +190,10 @@ One endpoint for all three types (`type`: `receipt`, `delivery` or `internal`).
 **Status flow**
 
 ```
-draft ──confirm──▶ ready ──validate──▶ done
+draft ──confirm──> ready ──validate──> done
           │          ▲
-          └▶ waiting ┘  (not enough stock; becomes ready automatically when stock arrives)
-draft / waiting / ready ──cancel──▶ canceled
+          └> waiting ┘  (not enough stock; becomes ready automatically when stock arrives)
+draft / waiting / ready ──cancel──> canceled
 ```
 
 | Method | Path | Body / Query | Notes |
@@ -324,14 +327,14 @@ One row per stock change **per location** (an internal transfer gives an "out" r
 |---|---|---|---|
 | GET | `/warehouses` | `?includeInactive=true` | `[{ id, name, code, address, isActive, locationCount, totalQuantity }]` |
 | GET | `/warehouses/:id` | – | warehouse + `locations` |
-| POST | `/warehouses` 🔒 | `{ name, code, address? }` | `201` (also creates its "Stock" location) |
-| PUT | `/warehouses/:id` 🔒 | `{ name?, code?, address?, isActive? }` | warehouse |
-| DELETE | `/warehouses/:id` 🔒 | – | `204` archive (409 if it still has stock or open operations) |
+| POST | `/warehouses` (M) | `{ name, code, address? }` | `201` (also creates its "Stock" location) |
+| PUT | `/warehouses/:id` (M) | `{ name?, code?, address?, isActive? }` | warehouse |
+| DELETE | `/warehouses/:id` (M) | – | `204` archive (409 if it still has stock or open operations) |
 | GET | `/locations` | `?warehouseId=&includeInactive=true` | `[{ id, warehouseId, warehouseName, name, code, fullCode, totalQuantity }]` |
 | GET | `/locations/:id` | – | location + `stock` in it |
-| POST | `/locations` 🔒 | `{ warehouseId, name, code }` | `201 location` |
-| PUT | `/locations/:id` 🔒 | `{ name?, code?, isActive? }` | location |
-| DELETE | `/locations/:id` 🔒 | – | `204` archive (409 if it still has stock or open operations) |
+| POST | `/locations` (M) | `{ warehouseId, name, code }` | `201 location` |
+| PUT | `/locations/:id` (M) | `{ name?, code?, isActive? }` | location |
+| DELETE | `/locations/:id` (M) | – | `204` archive (409 if it still has stock or open operations) |
 
 Codes are saved in uppercase. `fullCode` = warehouse code + location code, e.g. `WH/RACK-A`.
 

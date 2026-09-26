@@ -1,9 +1,9 @@
-# StockSense — Modern Inventory Management System
+# StockSense — Inventory Management System
 > Odoo x LPU Jalandhar Hackathon 2026
 
 StockSense replaces manual registers and Excel sheets with one real-time app for every stock movement:
 receipts from vendors, deliveries to customers, internal transfers between warehouses and racks, and stock
-adjustments after physical counts, all recorded in a stock ledger.
+adjustments after physical counts — all recorded in a stock ledger.
 
 | Part | Tech | Folder |
 |---|---|---|
@@ -13,7 +13,7 @@ adjustments after physical counts, all recorded in a stock ledger.
 
 ---
 
-## 🚀 Quick Start
+## Quick start
 
 Requirements: **Node.js 20+** and **PostgreSQL 13+** (running locally).
 
@@ -32,58 +32,60 @@ npm run db:seed
 npm run dev
 ```
 
-Open **http://localhost:3000**. The frontend forwards `/api` requests to the backend automatically.
+Open **http://localhost:3000**. Keep the terminal open — the site runs only while `npm run dev` is running.
 
-You can also run them separately: `npm run dev:backend` and `npm run dev:frontend`.
-
-## 🔑 Demo Login
+## Demo login
 
 | Role | Email | Password |
 |---|---|---|
 | Inventory Manager | `manager@stocksense.com` | `Manager@123` |
 | Warehouse Staff | `staff@stocksense.com` | `Staff@123` |
 
-Or click **Auto Login** on the sign-in screen. New sign-ups: the first account becomes the manager,
-later accounts join as staff (a manager can promote them from **My Profile → Team**).
+Both accounts are listed on the sign-in screen with a **Use this account** button. If you change one of
+their passwords (My Profile or Forgot password with OTP), the sign-in screen shows the new password in that
+browser, and an open sign-in tab updates immediately. New sign-ups: the first account becomes the Inventory Manager,
+later accounts join as Warehouse Staff (a manager can change roles in **Settings → Warehouses → Users & roles**).
 
-**Password reset:** without an email server configured, the 6-digit OTP is shown on the screen and in the
+**Password reset (OTP):** without an email server configured, the 6-digit OTP is shown on the screen and in the
 backend console (development mode). Add SMTP settings in `backend/.env` to send real emails.
 
 ---
 
-## 🌟 Pages
+## Problem statement → app
 
-| Page | Route | What you can do |
-|---|---|---|
-| Landing page | `/landing.html` | Marketing page |
-| Sign in / Sign up | `/#auth` | Login, signup, forgot password → OTP → new password |
-| Dashboard | `/#dashboard` | KPIs (products in stock, low / out of stock, pending receipts & deliveries, scheduled transfers), warehouse & category filters, movement chart (7/30/90 days), low stock alerts with one-click reorder, recent operations filtered by type & status, CSV export, SKU scan |
-| Products | `/#products` | Search by name / SKU, filter by category, stock level and warehouse, add / edit / archive products, initial stock, stock per location |
-| Product detail | `/#product-detail-:id` | Stock by location, free-to-use vs reserved, movement history, reordering rules, adjust or transfer stock |
-| Operations | `/#operations` | Receipts, delivery orders, internal transfers and adjustments: Draft → Waiting / Ready → Done, pick & pack, validate, cancel |
-| Warehouses | `/#warehouses` | Warehouses & locations (Settings → Warehouse), reordering rules with suggested order quantity |
-| Ledger | `/#ledger` | Move history and a stock ledger with running balance per location, CSV export |
-| Profile / Settings | `/#profile`, `/#settings` | Update profile, change password, team roles, currency, sign out |
+| Problem statement | Where in StockSense |
+|---|---|
+| Sign up / log in, OTP password reset, redirect to dashboard | Sign-in screen → **Dashboard** |
+| Dashboard KPIs: products in stock, low / out of stock, pending receipts, pending deliveries, internal transfers scheduled | **Dashboard** (5 KPI cards, click to open the matching list) |
+| Dynamic filters: document type, status, warehouse / location, product category | **Dashboard** filter bar (updates KPIs and the operations table) |
+| Products: create / update, stock per location, categories, reordering rules | **Products**, **Stock by Location**, **Categories**, **Reordering Rules** |
+| Product fields: name, SKU / code, category, unit of measure, initial stock | **Products → New Product** |
+| Receipts: supplier & products → quantities → validate → stock increases | **Operations → Receipts** |
+| Delivery orders: pick → pack → validate → stock decreases | **Operations → Delivery Orders** |
+| Internal transfers (warehouse → floor, rack → rack, warehouse → warehouse) | **Operations → Internal Transfers** |
+| Stock adjustments: select product / location, enter counted quantity | **Operations → Inventory Adjustment** |
+| Move history / stock ledger | **Move History** (moves + ledger with running balance) |
+| Setting → Warehouse | **Settings → Warehouses** (warehouses and their locations) |
+| Profile menu (left sidebar): My Profile, Logout | Bottom of the left sidebar |
+| Alerts for low stock, multi-warehouse, SKU search & smart filters | Bell icon + dashboard alerts, warehouses & locations, **Ctrl + K** search and list filters |
 
-Press **Ctrl + K** (⌘K) anywhere to search products and operations. The bell shows low stock alerts.
+## How stock moves
 
-## 🧱 How stock moves
-
-- **Receipt** (WH/IN/0001): validate → stock **increases** at the destination location.
-- **Delivery** (WH/OUT/0001): confirm → *Ready* if stock is available (it is reserved) or *Waiting* if not;
-  waiting orders become ready automatically when stock arrives; validate → stock **decreases**.
-- **Internal transfer** (WH/INT/0001): stock moves between locations / warehouses; total stock stays the same.
-- **Adjustment** (WH/ADJ/0001): enter the counted quantity; the difference is applied and logged.
+- **Receipt** (`WH/IN/0001`): validate → stock **increases** at the destination location.
+- **Delivery** (`WH/OUT/0001`): *Mark as To Do* → **Ready** if stock is available (it is reserved) or **Waiting** if not;
+  waiting orders become ready automatically when stock arrives; pick → pack → validate → stock **decreases**.
+- **Internal transfer** (`WH/INT/0001`): stock moves between locations / warehouses; total stock stays the same.
+- **Adjustment** (`WH/ADJ/0001`): enter the counted quantity; the difference is applied and logged.
 
 Every change is written to the stock ledger inside a database transaction, so stock can never go negative,
 even when two people validate at the same time.
 
-## 📚 More documentation
+## More documentation
 
-- [backend/README.md](backend/README.md) — backend setup, scripts, database design
+- [backend/README.md](backend/README.md) — backend setup, scripts and database design (ER diagram)
 - [backend/API.md](backend/API.md) — every API endpoint with examples
 
-## 🧪 Tests
+## Tests
 
 ```bash
 # Backend end-to-end API tests (needs a separate database whose name contains "test")

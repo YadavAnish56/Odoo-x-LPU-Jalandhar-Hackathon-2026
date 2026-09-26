@@ -1,4 +1,4 @@
-// Cached lists used by forms and filters (dropdowns).
+// Cached lists used by forms and filters (dropdowns), plus small cross-page helpers.
 import { api, fetchAll } from './api.js';
 
 let cache = null;
@@ -41,7 +41,7 @@ export function onDataChanged(handler) {
   return () => window.removeEventListener('stocksense:changed', handler);
 }
 
-// Lets one page open another with a filter already applied,
+// Lets one page open another with something already filled in,
 // e.g. dashboard "Low stock" card -> products page filtered to low stock.
 const nextFilters = {};
 
@@ -53,6 +53,16 @@ export function takeNextFilter(page) {
   const filter = nextFilters[page];
   delete nextFilters[page];
   return filter;
+}
+
+/** Opens a new receipt pre-filled with the suggested quantity of a low stock alert / reordering rule. */
+export async function reorder(rule) {
+  const { locations } = await getLookups();
+  setNextFilter('receipt-new', {
+    destLocationId: locations.find((l) => l.warehouseId === rule.warehouseId)?.id,
+    lines: [{ productId: rule.productId, quantity: rule.suggestedQty }],
+  });
+  window.location.hash = '#receipts/new';
 }
 
 export const locationOptions = (locations) =>

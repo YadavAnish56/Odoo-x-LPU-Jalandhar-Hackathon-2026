@@ -1,127 +1,211 @@
-import { api, getUser } from '../api.js';
-import { logout } from './auth.js';
-import { emptyHTML, errorHTML, esc, fmtQty, getSetting, loadingHTML, saveSettings, showToast } from '../utils.js';
+// Settings: warehouses and their locations (multi-warehouse support), plus user roles for managers.
+import { api, getUser, isManager } from '../api.js';
+import { invalidateLookups, notifyChanged, onDataChanged, warehouseOptions } from '../store.js';
+import {
+  button,
+  CARD,
+  errorHTML,
+  esc,
+  field,
+  fmtQty,
+  iconButton,
+  inputHTML,
+  loadingHTML,
+  optionsHTML,
+  readForm,
+  ROW,
+  FILTER,
+  sectionHeader,
+  selectHTML,
+  showError,
+  showModal,
+  showToast,
+  tableHTML,
+  TD,
+  textareaHTML,
+  toolbar,
+} from '../utils.js';
 
-const CURRENCIES = [
-  ['INR', 'Indian Rupee (₹)'],
-  ['USD', 'US Dollar ($)'],
-  ['EUR', 'Euro (€)'],
-  ['GBP', 'British Pound (£)'],
-];
-
-const inputClass =
-  'w-64 max-w-full bg-surface-container-low text-on-surface font-body-sm text-body-sm rounded-xl px-space-md py-2 outline-none focus:ring-2 focus:ring-primary-container transition-all text-right';
+const ROLE_LABEL = { manager: 'Inventory Manager', staff: 'Warehouse Staff' };
 
 export default function renderSettings(container) {
-  const user = getUser();
+  const manager = isManager();
+  const state = { warehouseId: '' };
+  let warehouses = [];
+  let locations = [];
+  const $ = (sel) => container.querySelector(sel);
+
   container.innerHTML = `
-    <div class="flex flex-col w-full pb-16">
-      <div class="pt-space-md mb-space-lg">
-        <h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Settings</h1>
-        <p class="font-body-md text-body-md text-secondary mt-1">Configure your StockSense workspace.</p>
-      </div>
+    ${manager
+      ? toolbar(button('New warehouse', { variant: 'primary', icon: 'add', attrs: 'id="add-warehouse"' }) + button('New location', { icon: 'add', attrs: 'id="add-location"' }))
+      : ''}
+    <section class="${CARD} overflow-hidden mb-4">
+      ${sectionHeader('Warehouses')}
+      <div id="warehouses">${loadingHTML()}</div>
+    </section>
+    <section class="${CARD} overflow-hidden mb-4">
+      ${sectionHeader('Locations', `<select id="f-warehouse" class="${FILTER}"><option value="">All warehouses</option></select>`)}
+      <div id="locations">${loadingHTML()}</div>
+    </section>
+    ${manager ? `<section class="${CARD} overflow-hidden">
+      ${sectionHeader('Users and roles')}
+      <div id="users">${loadingHTML()}</div>
+    </section>` : ''}`;
 
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div class="lg:col-span-3">
-          <div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm lg:sticky lg:top-24">
-            <nav class="flex flex-col gap-1">
-              ${navItem('general', 'General', 'settings')}
-              ${navItem('warehouses', 'Warehouses', 'warehouse')}
-              ${navItem('account', 'Account', 'person')}
-            </nav>
-          </div>
-        </div>
-
-        <div class="lg:col-span-9 flex flex-col gap-6">
-          <section id="section-general" class="bg-surface-container-lowest rounded-2xl p-6 shadow-sm">
-            <h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold mb-1">General Settings</h2>
-            <p class="font-body-sm text-body-sm text-secondary mb-4">Saved in this browser.</p>
-            <div class="space-y-1">
-              <div class="flex flex-wrap items-center justify-between gap-2 py-3 border-b border-surface-container">
-                <label class="font-body-md text-body-md text-on-surface font-medium">Company Name</label>
-                <input id="set-company" type="text" value="${esc(getSetting('companyName', 'StockSense Industries'))}" class="${inputClass}"/>
-              </div>
-              <div class="flex flex-wrap items-center justify-between gap-2 py-3 border-b border-surface-container">
-                <label class="font-body-md text-body-md text-on-surface font-medium">Currency</label>
-                <select id="set-currency" class="${inputClass}">
-                  ${CURRENCIES.map(([code, label]) => `<option value="${code}" ${getSetting('currency', 'INR') === code ? 'selected' : ''}>${label}</option>`).join('')}
-                </select>
-              </div>
-              <div class="flex flex-wrap items-center justify-between gap-2 py-3">
-                <label class="font-body-md text-body-md text-on-surface font-medium">Timezone</label>
-                <input type="text" readonly value="${esc(Intl.DateTimeFormat().resolvedOptions().timeZone)}" class="${inputClass} text-secondary"/>
-              </div>
-            </div>
-            <div class="flex justify-end mt-4">
-              <button id="save-settings" class="px-6 py-2.5 bg-primary-container hover:bg-primary text-on-primary font-label-md text-label-md rounded-xl shadow-sm transition-all active:scale-[0.99]">Save Changes</button>
-            </div>
-          </section>
-
-          <section id="section-warehouses" class="bg-surface-container-lowest rounded-2xl p-6 shadow-sm">
-            <div class="flex items-center justify-between mb-4">
-              <div>
-                <h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Warehouses</h2>
-                <p class="font-body-sm text-body-sm text-secondary">Your warehouses and their storage locations</p>
-              </div>
-              <a href="#warehouses" class="inline-flex items-center gap-1 px-4 py-2 bg-primary-container hover:bg-primary text-on-primary font-label-md text-label-md rounded-xl shadow-sm">Manage<span class="material-symbols-outlined text-[16px]">arrow_forward</span></a>
-            </div>
-            <div id="settings-warehouses">${loadingHTML()}</div>
-          </section>
-
-          <section id="section-account" class="bg-surface-container-lowest rounded-2xl p-6 shadow-sm">
-            <h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold mb-4">Account</h2>
-            <div class="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <div class="font-body-md text-body-md text-on-surface font-medium">${esc(user?.name ?? '')}</div>
-                <div class="font-body-sm text-body-sm text-secondary">${esc(user?.email ?? '')} · ${user?.role === 'manager' ? 'Inventory Manager' : 'Warehouse Staff'}</div>
-              </div>
-              <div class="flex items-center gap-2">
-                <a href="#profile" class="px-4 py-2 bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md rounded-xl">My Profile</a>
-                <button id="settings-logout" class="px-4 py-2 bg-error-container hover:bg-error text-on-error-container hover:text-on-error font-label-md text-label-md rounded-xl transition-all">Sign Out</button>
-              </div>
-            </div>
-          </section>
-        </div>
-      </div>
-    </div>
-  `;
-
-  container.querySelectorAll('[data-section]').forEach((link) => {
-    link.addEventListener('click', () => {
-      container.querySelector(`#section-${link.dataset.section}`).scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
-  });
-
-  container.querySelector('#save-settings').addEventListener('click', () => {
-    saveSettings({
-      companyName: container.querySelector('#set-company').value.trim(),
-      currency: container.querySelector('#set-currency').value,
-    });
-    showToast('Settings saved successfully!');
-  });
-  container.querySelector('#settings-logout').addEventListener('click', logout);
-
-  api
-    .get('/warehouses')
-    .then((warehouses) => {
+  async function load() {
+    try {
+      [warehouses, locations] = await Promise.all([api.get('/warehouses'), api.get('/locations')]);
       if (!container.isConnected) return;
-      container.querySelector('#settings-warehouses').innerHTML = warehouses.length
-        ? `<div class="divide-y divide-surface-container">${warehouses.map((w) => `
-            <div class="flex items-center justify-between py-3">
-              <div class="flex items-center gap-3">
-                <span class="material-symbols-outlined text-secondary">warehouse</span>
-                <div><div class="font-body-md text-body-md text-on-surface font-medium">${esc(w.name)} <span class="font-mono text-secondary text-label-md">${esc(w.code)}</span></div>
-                <div class="font-body-sm text-body-sm text-secondary">${esc(w.address || 'No address')}</div></div>
-              </div>
-              <div class="text-right font-body-sm text-body-sm text-secondary">${w.locationCount} location${w.locationCount === 1 ? '' : 's'} · ${fmtQty(w.totalQuantity)} units</div>
-            </div>`).join('')}</div>`
-        : emptyHTML('No warehouses yet', 'warehouse');
-    })
-    .catch((err) => {
-      if (container.isConnected) container.querySelector('#settings-warehouses').innerHTML = errorHTML(err);
-    });
-}
+      $('#warehouses').innerHTML = tableHTML(
+        ['Name', 'Short code', 'Address', { label: 'Locations', align: 'right' }, { label: 'Units in stock', align: 'right' }, ''],
+        warehouses.map(
+          (w) => `
+          <tr class="${ROW}">
+            <td class="${TD} font-medium">${esc(w.name)}</td>
+            <td class="${TD} font-mono">${esc(w.code)}</td>
+            <td class="${TD} text-secondary">${esc(w.address || '—')}</td>
+            <td class="${TD} text-right font-mono">${w.locationCount}</td>
+            <td class="${TD} text-right font-mono">${fmtQty(w.totalQuantity)}</td>
+            <td class="${TD} text-right whitespace-nowrap">${manager ? iconButton('edit', 'Edit', `data-edit-warehouse="${w.id}"`) + iconButton('archive', 'Archive', `data-archive-warehouse="${w.id}"`) : ''}</td>
+          </tr>`,
+        ),
+        'No warehouses yet.',
+      );
+      renderLocations();
+      $('#f-warehouse').innerHTML = optionsHTML(warehouseOptions(warehouses), state.warehouseId, 'All warehouses');
+      if (manager) loadUsers();
+    } catch (err) {
+      if (container.isConnected) $('#warehouses').innerHTML = errorHTML(err);
+    }
+  }
 
-function navItem(section, label, icon) {
-  return `<button data-section="${section}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-secondary hover:text-on-surface hover:bg-surface-container-low font-label-md text-label-md transition-colors text-left"><span class="material-symbols-outlined text-[20px]">${icon}</span>${label}</button>`;
+  function renderLocations() {
+    const list = locations.filter((l) => !state.warehouseId || String(l.warehouseId) === state.warehouseId);
+    $('#locations').innerHTML = tableHTML(
+      ['Full code', 'Name', 'Short code', 'Warehouse', { label: 'Units in stock', align: 'right' }, ''],
+      list.map(
+        (l) => `
+        <tr class="${ROW}">
+          <td class="${TD} font-mono">${esc(l.fullCode)}</td>
+          <td class="${TD}">${esc(l.name)}</td>
+          <td class="${TD} font-mono">${esc(l.code)}</td>
+          <td class="${TD}">${esc(l.warehouseName)}</td>
+          <td class="${TD} text-right font-mono">${fmtQty(l.totalQuantity)}</td>
+          <td class="${TD} text-right whitespace-nowrap">${manager ? iconButton('edit', 'Edit', `data-edit-location="${l.id}"`) + iconButton('archive', 'Archive', `data-archive-location="${l.id}"`) : ''}</td>
+        </tr>`,
+      ),
+      'No locations yet.',
+    );
+  }
+
+  async function loadUsers() {
+    try {
+      const users = await api.get('/users');
+      const me = getUser();
+      $('#users').innerHTML = tableHTML(
+        ['Name', 'Email', 'Role'],
+        users.map(
+          (u) => `
+          <tr class="${ROW}">
+            <td class="${TD} font-medium">${esc(u.name)}${u.id === me?.id ? ' <span class="text-secondary font-normal">(you)</span>' : ''}</td>
+            <td class="${TD}">${esc(u.email)}</td>
+            <td class="${TD}"><select data-role-user="${u.id}" ${u.id === me?.id ? 'disabled' : ''} class="${FILTER} w-52">${optionsHTML(Object.entries(ROLE_LABEL).map(([value, label]) => ({ value, label })), u.role)}</select></td>
+          </tr>`,
+        ),
+      );
+    } catch (err) {
+      $('#users').innerHTML = errorHTML(err);
+    }
+  }
+
+  function openWarehouseForm(w = null) {
+    showModal(w ? 'Edit warehouse' : 'New warehouse', `
+      <form class="flex flex-col gap-4" onsubmit="return false">
+        ${field('Name', inputHTML('name', w?.name ?? '', 'placeholder="e.g. Main Warehouse"'), { required: true })}
+        ${field('Short code', inputHTML('code', w?.code ?? '', 'placeholder="e.g. WH"'), { required: true, hint: 'Used in references, e.g. WH/IN/0001' })}
+        ${field('Address', textareaHTML('address', w?.address ?? '', 'placeholder="Street, city"'))}
+        ${w ? '' : '<p class="text-[13px] text-secondary">A "Stock" location is added automatically.</p>'}
+      </form>`, [
+      { id: 'cancel', label: 'Cancel' },
+      {
+        id: 'save',
+        label: 'Save',
+        variant: 'primary',
+        handler: async (overlay) => {
+          const v = readForm(overlay.querySelector('form'));
+          if (!v.name || !v.code) throw new Error('Name and short code are required');
+          if (w) await api.put(`/warehouses/${w.id}`, { name: v.name, code: v.code, address: v.address });
+          else await api.post('/warehouses', { name: v.name, code: v.code, address: v.address || undefined });
+          showToast(`Warehouse ${v.name} saved`);
+          notifyChanged();
+        },
+      },
+    ]);
+  }
+
+  function openLocationForm(l = null) {
+    showModal(l ? 'Edit location' : 'New location', `
+      <form class="flex flex-col gap-4" onsubmit="return false">
+        ${field('Warehouse', selectHTML('warehouseId', warehouseOptions(warehouses), l?.warehouseId ?? state.warehouseId, 'Select a warehouse...', l ? 'disabled' : ''), { required: true })}
+        ${field('Name', inputHTML('name', l?.name ?? '', 'placeholder="e.g. Rack A, Production Floor"'), { required: true })}
+        ${field('Short code', inputHTML('code', l?.code ?? '', 'placeholder="e.g. RACK-A"'), { required: true })}
+      </form>`, [
+      { id: 'cancel', label: 'Cancel' },
+      {
+        id: 'save',
+        label: 'Save',
+        variant: 'primary',
+        handler: async (overlay) => {
+          const v = readForm(overlay.querySelector('form'));
+          if (!v.name || !v.code || (!l && !v.warehouseId)) throw new Error('Warehouse, name and short code are required');
+          const saved = l
+            ? await api.put(`/locations/${l.id}`, { name: v.name, code: v.code })
+            : await api.post('/locations', { warehouseId: Number(v.warehouseId), name: v.name, code: v.code });
+          showToast(`Location ${saved.fullCode} saved`);
+          notifyChanged();
+        },
+      },
+    ]);
+  }
+
+  async function archive(kind, item) {
+    const label = kind === 'warehouses' ? item.name : item.fullCode;
+    if (!window.confirm(`Archive ${label}? It will no longer be used for new operations; its history is kept.`)) return;
+    try {
+      await api.del(`/${kind}/${item.id}`);
+      showToast(`${label} archived`);
+      notifyChanged();
+    } catch (err) {
+      showError(err);
+    }
+  }
+
+  $('#add-warehouse')?.addEventListener('click', () => openWarehouseForm());
+  $('#add-location')?.addEventListener('click', () => openLocationForm());
+  $('#f-warehouse').addEventListener('change', (e) => {
+    state.warehouseId = e.target.value;
+    renderLocations();
+  });
+  container.addEventListener('click', (e) => {
+    const find = (list, key) => list.find((x) => String(x.id) === e.target.closest(`[${key}]`).getAttribute(key));
+    if (e.target.closest('[data-edit-warehouse]')) openWarehouseForm(find(warehouses, 'data-edit-warehouse'));
+    else if (e.target.closest('[data-archive-warehouse]')) archive('warehouses', find(warehouses, 'data-archive-warehouse'));
+    else if (e.target.closest('[data-edit-location]')) openLocationForm(find(locations, 'data-edit-location'));
+    else if (e.target.closest('[data-archive-location]')) archive('locations', find(locations, 'data-archive-location'));
+  });
+  container.addEventListener('change', async (e) => {
+    const select = e.target.closest('[data-role-user]');
+    if (!select) return;
+    try {
+      const updated = await api.patch(`/users/${select.dataset.roleUser}/role`, { role: select.value });
+      showToast(`${updated.name} is now ${ROLE_LABEL[updated.role]}`);
+      invalidateLookups();
+    } catch (err) {
+      showError(err);
+      loadUsers();
+    }
+  });
+
+  load();
+  return onDataChanged(load);
 }

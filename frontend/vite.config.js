@@ -9,23 +9,7 @@ export default defineConfig(({ mode }) => {
   const proxy = { '/api': { target: apiTarget, changeOrigin: true } };
 
   return {
-    root: '.',
-    server: {
-      port: 3000,
-      open: true,
-      proxy,
-    },
-    preview: {
-      port: 3000,
-      proxy,
-    },
-    build: {
-      rollupOptions: {
-        input: {
-          main: fileURLToPath(new URL('./index.html', import.meta.url)),
-          landing: fileURLToPath(new URL('./landing.html', import.meta.url)),
-        },
-      },
-    },
+    server: { port: 3000, open: true, proxy },
+    preview: { port: 3000, proxy },
   };
 });

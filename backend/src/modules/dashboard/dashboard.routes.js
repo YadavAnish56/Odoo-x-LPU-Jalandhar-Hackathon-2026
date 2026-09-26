@@ -9,14 +9,16 @@ import { RULES_SQL } from '../products/reorderRules.routes.js';
 const router = Router();
 
 const filterSchema = z.object({ warehouseId: optionalId, categoryId: optionalId });
+const dashboardSchema = filterSchema.extend({ locationId: optionalId });
 
-// $1 = warehouseId, $2 = categoryId (both optional)
+// $1 = warehouseId, $2 = categoryId, $3 = locationId (all optional)
 const STOCK_KPIS_SQL = `
   WITH s AS (
     SELECT p.id, p.cost_price, COALESCE(SUM(q.quantity), 0) AS on_hand
     FROM products p
     LEFT JOIN stock_quants q ON q.product_id = p.id
       AND ($1::int IS NULL OR q.location_id IN (SELECT id FROM locations WHERE warehouse_id = $1::int))
+      AND ($3::int IS NULL OR q.location_id = $3::int)
     WHERE p.is_active AND ($2::int IS NULL OR p.category_id = $2::int)
     GROUP BY p.id
   ),
@@ -48,6 +50,7 @@ const OPERATION_KPIS_SQL = `
     AND ($2::int IS NULL OR EXISTS (
       SELECT 1 FROM operation_lines x JOIN products xp ON xp.id = x.product_id
       WHERE x.operation_id = o.id AND xp.category_id = $2::int))
+    AND ($3::int IS NULL OR o.source_location_id = $3::int OR o.dest_location_id = $3::int)
   GROUP BY o.type`;
 
 const RECENT_MOVES_SQL = `
@@ -59,6 +62,7 @@ const RECENT_MOVES_SQL = `
   LEFT JOIN locations tl ON tl.id = m.to_location_id LEFT JOIN warehouses tw ON tw.id = tl.warehouse_id
   WHERE ($1::int IS NULL OR fl.warehouse_id = $1::int OR tl.warehouse_id = $1::int)
     AND ($2::int IS NULL OR p.category_id = $2::int)
+    AND ($3::int IS NULL OR m.from_location_id = $3::int OR m.to_location_id = $3::int)
   ORDER BY m.created_at DESC, m.id DESC
   LIMIT 10`;
 
@@ -70,14 +74,21 @@ const ALERTS_SQL = `${RULES_SQL}
 
 const emptyCounts = { pending: 0, late: 0, draft: 0, waiting: 0, ready: 0, done: 0, canceled: 0 };
 
-// GET /api/dashboard?warehouseId=1&categoryId=2
-router.get('/dashboard', validate({ query: filterSchema }), async (req, res) => {
-  const params = [req.validQuery.warehouseId ?? null, req.validQuery.categoryId ?? null];
+// GET /api/dashboard?warehouseId=1&locationId=4&categoryId=2
+router.get('/dashboard', validate({ query: dashboardSchema }), async (req, res) => {
+  const { categoryId, locationId } = req.validQuery;
+  let { warehouseId } = req.validQuery;
+  // A location belongs to one warehouse: its reorder rules are the ones that apply.
+  if (locationId && !warehouseId) {
+    const { rows } = await query('SELECT warehouse_id FROM locations WHERE id = $1', [locationId]);
+    warehouseId = rows[0]?.warehouse_id;
+  }
+  const params = [warehouseId ?? null, categoryId ?? null, locationId ?? null];
   const [stock, ops, moves, alerts] = await Promise.all([
     query(STOCK_KPIS_SQL, params),
     query(OPERATION_KPIS_SQL, params),
     query(RECENT_MOVES_SQL, params),
-    query(`${ALERTS_SQL} LIMIT 10`, params),
+    query(`${ALERTS_SQL} LIMIT 10`, params.slice(0, 2)),
   ]);
 
   const operations = Object.fromEntries(OPERATION_TYPES.map((t) => [t, { ...emptyCounts }]));

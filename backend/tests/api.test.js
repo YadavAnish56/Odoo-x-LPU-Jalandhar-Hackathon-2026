@@ -431,6 +431,15 @@ describe('StockSense API', { skip }, () => {
     assert.equal(alerts.body.length, 1);
   });
 
+  test('dashboard KPIs can be filtered by location', async () => {
+    const res = await api('GET', `/api/dashboard?locationId=${ids.rack}`, { token: tokens.manager });
+    assert.equal(res.status, 200);
+    assert.equal(res.body.kpis.totalProducts, 2);
+    assert.equal(res.body.kpis.productsInStock, 1); // only the 40 steel rods are on Rack A
+    assert.equal(res.body.kpis.pendingReceipts, 0);
+    assert.equal(res.body.operations.internal.done, 1);
+  });
+
   test('logout invalidates the token', async () => {
     assert.equal((await api('POST', '/api/auth/logout', { token: tokens.staff })).status, 200);
     assert.equal((await api('GET', '/api/products', { token: tokens.staff })).status, 401);

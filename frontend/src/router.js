@@ -1,12 +1,19 @@
-// Simple hash-based SPA router with parameters, e.g. route('product-detail-:id', handler)
+// Simple hash-based router with parameters, e.g. route('receipts/:id', handler)
+import { esc } from './utils.js';
+
 const routes = [];
 let currentCleanup = null;
 let started = false;
 let guard = () => true;
 
-export function route(path, handler, { nav = path } = {}) {
+/**
+ * Registers a page. options: { nav } = sidebar item to highlight, { title } = page title,
+ * { parent } = { label, href } shown as a breadcrumb before the title.
+ * Routes are matched in the order they are registered.
+ */
+export function route(path, handler, { nav = path, title = '', parent = null } = {}) {
   const pattern = new RegExp(`^${path.replace(/:(\w+)/g, '(?<$1>[^/?]+)')}$`);
-  routes.push({ pattern, handler, nav });
+  routes.push({ pattern, handler, nav, title, parent });
 }
 
 export function navigate(path) {
@@ -22,21 +29,15 @@ export function setRouteGuard(fn) {
   guard = fn;
 }
 
-function setActiveNav(navKey) {
-  document.querySelectorAll('[data-nav-path]').forEach((el) => {
-    const active = el.dataset.navPath === navKey;
-    el.classList.toggle('bg-primary-container', active);
-    el.classList.toggle('text-on-primary-container', active);
-    el.classList.toggle('font-semibold', active);
-    el.classList.toggle('text-on-surface-variant', !active);
-    el.classList.toggle('hover:text-on-surface', !active);
-    el.classList.toggle('hover:bg-surface-container-high', !active);
-  });
-  document.querySelectorAll('[data-mobile-nav-path]').forEach((el) => {
-    const active = el.dataset.mobileNavPath === navKey;
-    el.classList.toggle('text-primary-container', active);
-    el.classList.toggle('text-secondary', !active);
-  });
+/** Sets the title in the top bar, e.g. "Receipts / WH/IN/0005" when a parent is given. */
+export function setPageTitle(title, parent = null) {
+  const el = document.getElementById('page-title');
+  if (el) {
+    el.innerHTML = parent
+      ? `<a href="${parent.href}" class="font-normal text-secondary hover:text-on-surface">${esc(parent.label)}</a><span class="font-normal text-secondary whitespace-pre"> / </span>${esc(title)}`
+      : esc(title);
+  }
+  document.title = `${title} · StockSense`;
 }
 
 async function handleRoute() {
@@ -53,12 +54,16 @@ async function handleRoute() {
 
   if (typeof currentCleanup === 'function') currentCleanup();
   currentCleanup = null;
-  setActiveNav(match.r.nav);
+
+  document.querySelectorAll('[data-nav-path]').forEach((el) => {
+    el.classList.toggle('active', el.dataset.navPath === match.r.nav);
+  });
+  document.body.classList.remove('sidebar-open');
+  setPageTitle(match.r.title, match.r.parent);
 
   // Each page renders into its own element, so a slow request from a page
   // the user already left cannot overwrite the new page.
   const page = document.createElement('div');
-  page.className = 'flex flex-col w-full';
   app.replaceChildren(page);
   window.scrollTo(0, 0);
 
@@ -70,7 +75,7 @@ async function handleRoute() {
     }
   } catch (err) {
     console.error(err);
-    page.innerHTML = `<div class="p-12 text-center text-secondary">Something went wrong while opening this page.</div>`;
+    page.innerHTML = '<div class="p-12 text-center text-secondary">Something went wrong while opening this page.</div>';
   }
 }
 
