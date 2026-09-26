@@ -15,14 +15,14 @@ export default function renderWarehouses(container) {
       <!-- Warehouse Cards -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
         ${data.warehouses.map(w => `
-          <div class="bg-surface-container-lowest rounded-2xl p-6 shadow-sm hover:shadow-md transition-all group relative overflow-hidden">
+          <div onclick="window.location.hash='#products'" class="bg-surface-container-lowest rounded-2xl p-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all group relative overflow-hidden cursor-pointer">
             <div class="absolute -right-8 -top-8 w-32 h-32 bg-surface-container-low rounded-full pointer-events-none group-hover:scale-125 transition-transform"></div>
             <div class="relative z-10">
               <div class="flex items-center justify-between mb-4">
-                <div class="p-2.5 rounded-xl bg-surface-container text-on-surface"><span class="material-symbols-outlined text-[24px]">warehouse</span></div>
+                <div class="p-2.5 rounded-xl bg-surface-container text-on-surface group-hover:bg-primary-container group-hover:text-white transition-colors"><span class="material-symbols-outlined text-[24px]">warehouse</span></div>
                 ${w.lowStockCount > 0 ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-primary-fixed text-primary font-label-sm text-label-sm font-semibold"><span class="w-1.5 h-1.5 rounded-full bg-primary-container animate-pulse"></span>${w.lowStockCount} Low</span>` : '<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-label-sm text-label-sm font-semibold"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Healthy</span>'}
               </div>
-              <h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold mb-3">${w.name}</h3>
+              <h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold mb-3 group-hover:text-primary transition-colors">${w.name}</h3>
               <div class="grid grid-cols-3 gap-3 mb-4">
                 <div class="text-center"><div class="font-headline-md text-headline-md text-on-surface font-semibold">${w.products}</div><div class="font-label-sm text-label-sm text-secondary">Products</div></div>
                 <div class="text-center"><div class="font-headline-md text-headline-md text-on-surface font-semibold">${w.stockUnits.toLocaleString()}</div><div class="font-label-sm text-label-sm text-secondary">Units</div></div>
@@ -32,9 +32,11 @@ export default function renderWarehouses(container) {
                 <div class="flex justify-between font-label-sm text-label-sm mb-1"><span class="text-secondary">Capacity</span><span class="font-mono text-on-surface font-medium">${w.capacity}%</span></div>
                 <div class="w-full bg-surface-container-low h-2 rounded-full overflow-hidden"><div class="bg-primary-container h-full rounded-full transition-all" style="width:${w.capacity}%"></div></div>
               </div>
-              <div class="flex flex-wrap gap-1.5">
-                ${w.locations.slice(0, 4).map(l => `<span class="px-2 py-0.5 bg-surface-container-low rounded text-label-sm font-label-sm text-secondary">${l}</span>`).join('')}
-                ${w.locations.length > 4 ? `<span class="px-2 py-0.5 bg-surface-container-low rounded text-label-sm font-label-sm text-secondary">+${w.locations.length - 4} more</span>` : ''}
+              <div class="flex items-center justify-between pt-2 border-t border-surface-container-low text-label-sm font-label-sm">
+                <div class="flex flex-wrap gap-1.5">
+                  ${w.locations.slice(0, 2).map(l => `<span class="px-2 py-0.5 bg-surface-container-low rounded text-secondary">${l}</span>`).join('')}
+                </div>
+                <span class="text-primary font-semibold flex items-center gap-0.5">View Stock <span class="material-symbols-outlined text-[13px]">arrow_forward</span></span>
               </div>
             </div>
           </div>

@@ -17,14 +17,6 @@ function renderAuth() {
   container.innerHTML = `
     <div class="min-h-screen flex items-center justify-center bg-background px-gutter-mobile py-10">
       <div class="w-full max-w-md">
-        <!-- Back to landing button -->
-        <div class="w-full flex justify-start mb-4">
-          <a href="/landing.html" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface-variant font-label-md text-label-md transition-colors shadow-xs">
-            <span class="material-symbols-outlined text-[16px]">arrow_back</span>
-            <span>Back to Landing Page</span>
-          </a>
-        </div>
-
         <!-- Logo & Brand -->
         <div class="flex flex-col items-center mb-8">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="56" height="56" fill="none" class="mb-4">

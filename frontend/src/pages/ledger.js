@@ -47,7 +47,7 @@ export default function renderLedger(container) {
                   <td class="py-3.5 px-4 text-secondary font-mono">${m.timestamp}</td>
                   <td class="py-3.5 px-4 font-mono font-semibold">${m.ref}</td>
                   <td class="py-3.5 px-4">${operationIcon(m.operation)}</td>
-                  <td class="py-3.5 px-4 font-medium">${m.product}</td>
+                  <td class="py-3.5 px-4 font-medium text-on-surface hover:text-primary cursor-pointer transition-colors" onclick="window.location.hash='#products'">${m.product}</td>
                   <td class="py-3.5 px-4 text-right font-mono font-semibold ${m.qty.startsWith('+') ? 'text-emerald-600' : m.qty.startsWith('-') ? 'text-error' : 'text-on-surface'}">${m.qty}</td>
                   <td class="py-3.5 px-4 text-secondary">${m.from}</td>
                   <td class="py-3.5 px-4 text-secondary">${m.to}</td>
@@ -75,7 +75,7 @@ export default function renderLedger(container) {
                   <td class="py-3.5 px-4 text-secondary font-mono">${l.date}</td>
                   <td class="py-3.5 px-4 font-mono font-semibold">${l.ref}</td>
                   <td class="py-3.5 px-4">${operationIcon(l.operation)}</td>
-                  <td class="py-3.5 px-4 font-medium">${l.product}</td>
+                  <td class="py-3.5 px-4 font-medium text-on-surface hover:text-primary cursor-pointer transition-colors" onclick="window.location.hash='#products'">${l.product}</td>
                   <td class="py-3.5 px-4 text-secondary">${l.location}</td>
                   <td class="py-3.5 px-4 text-right font-mono ${l.inQty > 0 ? 'text-emerald-600 font-semibold' : 'text-secondary'}">${l.inQty > 0 ? `+${l.inQty}` : '—'}</td>
                   <td class="py-3.5 px-4 text-right font-mono ${l.outQty > 0 ? 'text-error font-semibold' : 'text-secondary'}">${l.outQty > 0 ? `-${l.outQty}` : '—'}</td>

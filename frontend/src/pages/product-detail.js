@@ -1,5 +1,5 @@
 import data from '../data.js';
-import { statusBadge } from '../utils.js';
+import { statusBadge, showToast, showModal, formField } from '../utils.js';
 
 export default function renderProductDetail(container, productId) {
   const p = data.products.find(pr => pr.id === productId);
@@ -11,7 +11,10 @@ export default function renderProductDetail(container, productId) {
     <div class="flex flex-col w-full pb-16">
       <!-- Breadcrumb -->
       <div class="flex items-center gap-space-xs text-secondary font-label-sm text-label-sm mb-6 pt-2">
-        <a href="#products" class="hover:text-on-surface transition-colors cursor-pointer">Products</a>
+        <a href="#products" class="hover:text-primary transition-colors cursor-pointer flex items-center gap-1 font-semibold">
+          <span class="material-symbols-outlined text-[16px]">arrow_back</span>
+          <span>Products</span>
+        </a>
         <span class="material-symbols-outlined text-[14px]">chevron_right</span>
         <span class="text-on-surface font-medium">${p.name}</span>
       </div>
@@ -33,9 +36,8 @@ export default function renderProductDetail(container, productId) {
           </div>
         </div>
         <div class="flex items-center gap-space-sm">
-          <button class="px-4 py-2 bg-surface-container-lowest hover:bg-surface-container text-on-surface font-label-md text-label-md rounded-xl shadow-sm transition-all flex items-center gap-1.5"><span class="material-symbols-outlined text-[18px]">edit</span>Edit</button>
-          <button class="px-4 py-2 bg-surface-container-lowest hover:bg-surface-container text-on-surface font-label-md text-label-md rounded-xl shadow-sm transition-all flex items-center gap-1.5"><span class="material-symbols-outlined text-[18px]">sync_alt</span>Transfer</button>
-          <button class="px-4 py-2 bg-primary-container hover:bg-primary text-on-primary font-label-md text-label-md rounded-xl shadow-sm transition-all flex items-center gap-1.5"><span class="material-symbols-outlined text-[18px]">tune</span>Adjust Stock</button>
+          <button onclick="window.location.hash='#operations'" class="px-4 py-2 bg-surface-container-lowest hover:bg-surface-container text-on-surface font-label-md text-label-md rounded-xl shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"><span class="material-symbols-outlined text-[18px]">sync_alt</span>Transfer</button>
+          <button id="btn-adjust-stock" class="px-4 py-2 bg-primary-container hover:bg-primary text-on-primary font-label-md text-label-md rounded-xl shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"><span class="material-symbols-outlined text-[18px]">tune</span>Adjust Stock</button>
         </div>
       </div>
 
@@ -96,13 +98,19 @@ export default function renderProductDetail(container, productId) {
 
           <!-- Movement History -->
           <div class="bg-surface-container-lowest rounded-2xl p-6 shadow-sm">
-            <h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold mb-4">Movement History</h2>
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Movement History</h2>
+              <a onclick="window.location.hash='#ledger'" class="font-label-md text-label-md text-primary hover:text-primary-container font-semibold transition-colors cursor-pointer flex items-center gap-1">
+                <span>View Full Ledger</span>
+                <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+              </a>
+            </div>
             ${movements.length ? `
               <div class="space-y-2">
                 ${movements.map(m => `
-                  <div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-low/40 hover:bg-surface-container-low transition-colors">
+                  <div onclick="window.location.hash='#ledger'" class="flex items-center justify-between p-3 rounded-xl bg-surface-container-low/40 hover:bg-surface-container-low transition-colors cursor-pointer group">
                     <div class="flex items-center gap-3">
-                      <span class="px-2 py-0.5 rounded bg-surface-container font-mono text-label-sm font-semibold text-on-surface">${m.ref}</span>
+                      <span class="px-2 py-0.5 rounded bg-surface-container font-mono text-label-sm font-semibold text-on-surface group-hover:text-primary transition-colors">${m.ref}</span>
                       <div>
                         <div class="font-body-sm text-body-sm text-on-surface font-medium">${m.operation}</div>
                         <div class="font-label-sm text-label-sm text-secondary">${m.timestamp}</div>
@@ -148,6 +156,25 @@ export default function renderProductDetail(container, productId) {
       </div>
     </div>
   `;
+
+  // Wire Adjust Stock Modal
+  container.querySelector('#btn-adjust-stock')?.addEventListener('click', () => {
+    showModal(`Adjust Stock: ${p.name}`, `
+      <div class="flex flex-col gap-4">
+        <div class="p-3 rounded-xl bg-surface-container-low text-body-sm text-secondary">
+          Current recorded stock: <strong class="text-on-surface">${p.totalStock} ${p.unit}</strong>
+        </div>
+        ${formField('Physical Counted Quantity', 'number', 'newQty', p.totalStock)}
+        ${formField('Reason for Adjustment', 'select', 'reason', 'Cycle Count', '', ['Cycle Count', 'Damaged Stock', 'Found Inventory', 'Shrinkage'])}
+      </div>
+    `, [
+      { id: 'cancel', label: 'Cancel', primary: false, handler: () => {} },
+      { id: 'confirm', label: 'Apply Adjustment', primary: true, handler: () => {
+        showToast('Stock adjustment recorded & hashed in ledger!', 'success');
+        setTimeout(() => window.location.hash = '#ledger', 500);
+      }},
+    ]);
+  });
 }
 
 function infoRow(label, value) {

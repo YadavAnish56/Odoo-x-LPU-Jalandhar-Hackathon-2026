@@ -45,11 +45,11 @@ export default function renderDashboard(container) {
                 <span class="flex items-center justify-center w-4 h-4 rounded-full bg-emerald-100 text-emerald-700"><span class="material-symbols-outlined text-[12px]">south_west</span></span>
                 <span class="font-semibold">+100 kg</span> Received
               </div>
-              <div class="relative z-10 bg-surface-container-lowest rounded-2xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)] transition-all">
+              <div class="relative z-10 bg-surface-container-lowest rounded-2xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)] transition-all cursor-pointer group" onclick="window.location.hash='#product-detail-1'">
                 <div class="flex items-start justify-between">
                   <div>
                     <span class="font-label-sm text-label-sm font-mono tracking-wider text-secondary uppercase">SKU: STL-001</span>
-                    <h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold mt-0.5">High-Yield Steel Rod</h3>
+                    <h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold mt-0.5 group-hover:text-primary transition-colors">High-Yield Steel Rod</h3>
                   </div>
                   <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 font-label-sm text-label-sm"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>In Stock</span>
                 </div>
@@ -64,7 +64,7 @@ export default function renderDashboard(container) {
                   <div class="bg-primary-container h-full rounded-full transition-all duration-1000" style="width: 72%;"></div>
                 </div>
                 <div class="mt-2 flex items-center justify-between text-secondary font-label-sm text-label-sm">
-                  <span>Safety Threshold: 120 kg</span><span>Capacity: 700 kg</span>
+                  <span>Safety Threshold: 120 kg</span><span class="text-primary font-medium flex items-center gap-0.5">View details <span class="material-symbols-outlined text-[13px]">arrow_forward</span></span>
                 </div>
               </div>
               <div class="absolute -bottom-4 -left-4 z-20 flex items-center gap-2 bg-surface-container-lowest text-on-surface px-3.5 py-2 rounded-xl shadow-lg font-label-sm text-label-sm backdrop-blur-md">
@@ -84,7 +84,7 @@ export default function renderDashboard(container) {
       <section class="w-full mt-2 mb-10">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
           <!-- Hero Card -->
-          <div class="lg:col-span-2 relative overflow-hidden rounded-2xl bg-gradient-to-br from-on-background via-inverse-surface to-[#222121] text-surface p-6 shadow-md flex flex-col justify-between min-h-[170px] group">
+          <div onclick="window.location.hash='#products'" class="lg:col-span-2 relative overflow-hidden rounded-2xl bg-gradient-to-br from-on-background via-inverse-surface to-[#222121] text-surface p-6 shadow-md flex flex-col justify-between min-h-[170px] group cursor-pointer hover:shadow-lg transition-all">
             <div class="absolute -right-8 -bottom-8 w-36 h-36 bg-primary-container/25 rounded-full blur-2xl group-hover:scale-125 transition-transform duration-700"></div>
             <div class="flex items-start justify-between relative z-10">
               <div>
@@ -100,10 +100,10 @@ export default function renderDashboard(container) {
               <div class="w-2.5 h-2.5 rounded-full bg-primary-container animate-pulse shadow-[0_0_12px_#f97316]"></div>
             </div>
           </div>
-          ${kpiCard('Low Stock', data.kpis.lowStockItems, 'items', 'Below buffer threshold', 'warning', 'primary-fixed', 'primary')}
-          ${kpiCard('Out of Stock', data.kpis.outOfStockItems, 'SKUs', '', 'block', 'error-container', 'error', true)}
-          ${kpiCard('Pending Receipts', data.kpis.pendingReceipts, '', 'Incoming freight dock', 'move_to_inbox', 'surface-container', 'on-surface')}
-          ${kpiCard('Pending Outbound', data.kpis.pendingDeliveries, '', 'Scheduled today', 'local_shipping', 'surface-container', 'on-surface')}
+          ${kpiCard('Low Stock', data.kpis.lowStockItems, 'items', 'Below buffer threshold', 'warning', 'primary-fixed', 'primary', false, '#products')}
+          ${kpiCard('Out of Stock', data.kpis.outOfStockItems, 'SKUs', '', 'block', 'error-container', 'error', true, '#products')}
+          ${kpiCard('Pending Receipts', data.kpis.pendingReceipts, '', 'Incoming freight dock', 'move_to_inbox', 'surface-container', 'on-surface', false, '#operations')}
+          ${kpiCard('Pending Outbound', data.kpis.pendingDeliveries, '', 'Scheduled today', 'local_shipping', 'surface-container', 'on-surface', false, '#operations')}
         </div>
       </section>
 
@@ -277,8 +277,8 @@ export default function renderDashboard(container) {
               </thead>
               <tbody class="font-body-sm text-body-sm text-on-surface">
                 ${data.moveHistory.slice(0, 4).map(m => `
-                  <tr class="hover:bg-surface-container-low/70 transition-colors">
-                    <td class="py-3.5 px-4 font-mono font-semibold ${m.opColor === 'green' ? 'text-primary' : 'text-on-surface'}">${m.ref}</td>
+                  <tr onclick="window.location.hash='#ledger'" class="hover:bg-surface-container-low/70 transition-colors cursor-pointer group">
+                    <td class="py-3.5 px-4 font-mono font-semibold ${m.opColor === 'green' ? 'text-primary' : 'text-on-surface'} group-hover:text-primary transition-colors">${m.ref}</td>
                     <td class="py-3.5 px-4"><span class="inline-flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px] ${opIconColor(m.opColor)}">${opIcon(m.operation)}</span>${m.operation}</span></td>
                     <td class="py-3.5 px-4 font-medium">${m.product}</td>
                     <td class="py-3.5 px-4 text-right font-mono font-semibold ${m.qty.startsWith('+') ? 'text-emerald-600' : m.qty.startsWith('-') ? 'text-error' : 'text-on-surface'}">${m.qty}</td>
@@ -296,24 +296,24 @@ export default function renderDashboard(container) {
   `;
 }
 
-function kpiCard(title, value, unit, subtitle, icon, iconBg, iconColor, showLink = false) {
+function kpiCard(title, value, unit, subtitle, icon, iconBg, iconColor, showLink = false, targetRoute = '#products') {
   return `
-    <div class="lg:col-span-1 rounded-2xl bg-surface-container-lowest p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+    <div onclick="window.location.hash='${targetRoute}'" class="lg:col-span-1 rounded-2xl bg-surface-container-lowest p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all flex flex-col justify-between cursor-pointer group">
       <div class="flex items-center justify-between">
         <span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary font-medium">${title}</span>
-        <span class="p-1 rounded-lg bg-${iconBg} text-${iconColor}"><span class="material-symbols-outlined text-[16px]">${icon}</span></span>
+        <span class="p-1 rounded-lg bg-${iconBg} text-${iconColor} group-hover:scale-110 transition-transform"><span class="material-symbols-outlined text-[16px]">${icon}</span></span>
       </div>
       <div class="mt-3">
         <div class="font-metric-val text-metric-val ${title === 'Low Stock' ? 'text-primary-container' : 'text-on-surface'} font-semibold tracking-tight">${value} ${unit ? `<span class="text-body-md text-secondary font-normal">${unit}</span>` : ''}</div>
         ${subtitle ? `<p class="font-body-sm text-body-sm text-secondary mt-0.5">${subtitle}</p>` : ''}
-        ${showLink ? `<a href="#products" class="inline-flex items-center gap-1 font-label-sm text-label-sm text-primary hover:text-primary-container mt-1 font-semibold">Prompt reorder<span class="material-symbols-outlined text-[12px]">arrow_forward</span></a>` : ''}
+        ${showLink ? `<span class="inline-flex items-center gap-1 font-label-sm text-label-sm text-primary group-hover:text-primary-container mt-1 font-semibold">Prompt reorder<span class="material-symbols-outlined text-[12px]">arrow_forward</span></span>` : ''}
       </div>
     </div>`;
 }
 
 function quickAction(icon, title, subtitle, href = '#') {
   return `
-    <button onclick="${href !== '#' ? `window.location.hash='${href}'` : ''}" class="w-full flex items-center justify-between p-3 rounded-xl bg-surface-container-low hover:bg-surface-container transition-all group text-left" type="button">
+    <button onclick="${href !== '#' ? `window.location.hash='${href}'` : ''}" class="w-full flex items-center justify-between p-3 rounded-xl bg-surface-container-low hover:bg-surface-container transition-all group text-left cursor-pointer" type="button">
       <div class="flex items-center gap-3">
         <span class="p-2 rounded-lg bg-surface-container-lowest text-primary-container shadow-sm group-hover:scale-105 transition-transform"><span class="material-symbols-outlined text-[20px]">${icon}</span></span>
         <div><div class="font-body-md text-body-md text-on-surface font-medium">${title}</div><div class="font-label-sm text-label-sm text-secondary">${subtitle}</div></div>
