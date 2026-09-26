@@ -34,6 +34,23 @@ npm run dev
 
 Open **http://localhost:3000**. Keep the terminal open — the site runs only while `npm run dev` is running.
 
+## Deploy online (free)
+
+The backend serves the built frontend in production, so the whole app runs as **one web service**.
+The repo includes a [render.yaml](render.yaml) for [Render](https://render.com); the database can be a free
+[Neon](https://neon.tech) PostgreSQL.
+
+1. **Neon:** create a project and copy its connection string (`postgresql://...neon.tech/neondb?sslmode=require`).
+2. **Render:** New → Blueprint → select this repository. When asked, paste the Neon string as `DATABASE_URL`.
+   Render builds with `npm run setup && npm run build` and starts with `npm run db:setup && npm start`
+   (creates the tables and the demo data on the first start).
+3. Open the `https://<name>.onrender.com` link. Every push to `main` redeploys automatically.
+
+Password reset emails: add `SMTP_HOST=smtp.gmail.com`, `SMTP_PORT=587`, `SMTP_USER` and `SMTP_PASS`
+(a Gmail app password) in Render → Environment. Without them the reset code is only written to Render's logs.
+
+Free plan: the service sleeps after 15 minutes without visits; the next visit takes about a minute.
+
 ## Demo login
 
 | Role | Email | Password |
