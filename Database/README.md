@@ -6,7 +6,7 @@ PostgreSQL database schema, demo seed data, and analytical views for StockSense.
 
 ## Quick Setup
 
-Make sure PostgreSQL is running locally on port 5432 with an active database named `stocksense`.
+Make sure PostgreSQL is running locally on port 5432. The steps below create a database named `stocksense`.
 
 ### Option 1: Using `psql` directly
 
@@ -41,12 +41,14 @@ npm run db:seed
 
 ## Demo Accounts
 
-The seed script creates two default users:
+Both seed options create these two default users:
 
 | Name | Role | Email | Password |
 |---|---|---|---|
 | Inventory Manager | `manager` | `manager@stocksense.com` | `Manager@123` |
 | Warehouse Staff | `staff` | `staff@stocksense.com` | `Staff@123` |
+
+`02_seed.sql` also creates three more users (`rahul.sharma@`, `priya.patel@` and `amit.verma@stocksense.com`). They all use the password `Staff@123`, including Priya Patel, who is a `manager`.
 
 Passwords are pre-hashed using `bcryptjs` (cost factor 10).
 
@@ -60,9 +62,9 @@ The database consists of 12 core tables designed around double-entry warehouse m
 
 1. **`users`**: System users with role-based permissions (`manager`, `staff`) and `token_version` for session invalidation.
 2. **`password_reset_otps`**: Stores hashed 6-digit verification codes for password recovery with expiry and attempt throttling.
-3. **`warehouses`**: Physical facilities (e.g. `WH` - Main Warehouse, `WH2` - Secondary Warehouse).
+3. **`warehouses`**: Physical facilities (e.g. `WH` - Central Warehouse, `WH2` - Regional Logistics Hub, `WH3` - North Distribution Center).
 4. **`locations`**: Storage bins, racks, or areas scoped to a warehouse (e.g. `WH/STOCK`, `WH/RACK-A`, `WH/PROD`). Unique per `(warehouse_id, code)`.
-5. **`categories`**: Product classifications (Raw Materials, Furniture, Electronics, Packaging).
+5. **`categories`**: Product classifications (Raw Materials, Finished Furniture, Electronics & IT, Packaging Supplies, Fasteners & Hardware, Safety & PPE).
 6. **`products`**: Product catalog items with SKU, unit of measure (`uom`), cost price, and active toggle.
 7. **`stock_quants`**: Current stock on hand per `(product_id, location_id)`.
 8. **`reorder_rules`**: Minimum and maximum stock thresholds configured per product per warehouse.
@@ -90,7 +92,7 @@ Run `Database/03_views.sql` to install these convenience views:
 
 - `v_stock_summary`: Current on-hand quantities with warehouse codes, full location paths (`WH/STOCK`), and item valuation.
 - `v_product_inventory`: Aggregated inventory across all warehouses with total stock counts and inventory value.
-- `v_low_stock_alerts`: Products whose warehouse stock has fallen below the configured `min_qty` in `reorder_rules`.
+- `v_low_stock_alerts`: Active products whose warehouse stock is at or below the configured `min_qty` in `reorder_rules`.
 - `v_operations_overview`: High-level list of operations with resolved location codes, partner names, line counts, and user names.
 - `v_stock_ledger`: Human-readable audit log of all stock movements.
 - `v_dashboard_kpis`: Fast single-row KPI aggregate for dashboard stat cards.

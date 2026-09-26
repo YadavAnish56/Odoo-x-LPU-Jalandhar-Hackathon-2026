@@ -39,7 +39,7 @@ SELECT
   p.is_active,
   COALESCE(SUM(sq.quantity), 0) AS total_on_hand,
   ROUND(COALESCE(SUM(sq.quantity), 0) * p.cost_price, 2) AS total_valuation,
-  COUNT(DISTINCT sq.location_id) AS stored_in_locations
+  COUNT(DISTINCT sq.location_id) FILTER (WHERE sq.quantity > 0) AS stored_in_locations
 FROM products p
 LEFT JOIN categories c ON c.id = p.category_id
 LEFT JOIN stock_quants sq ON sq.product_id = p.id
@@ -70,7 +70,7 @@ SELECT
   rr.max_qty,
   GREATEST(rr.max_qty - COALESCE(ws.current_stock, 0), 0) AS reorder_quantity
 FROM reorder_rules rr
-JOIN products p ON p.id = rr.product_id
+JOIN products p ON p.id = rr.product_id AND p.is_active
 JOIN warehouses w ON w.id = rr.warehouse_id
 LEFT JOIN warehouse_stock ws ON ws.product_id = rr.product_id AND ws.warehouse_id = rr.warehouse_id
 WHERE COALESCE(ws.current_stock, 0) <= rr.min_qty;

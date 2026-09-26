@@ -76,7 +76,7 @@ ON CONFLICT (id) DO NOTHING;
 
 -- Stock Quants (Live inventory across locations)
 INSERT INTO stock_quants (product_id, location_id, quantity) VALUES
-  (1,  1, 120.000),  -- Steel Rods in WH Main Stock
+  (1,  1, 100.000),  -- Steel Rods in WH Main Stock
   (1,  4,  45.000),  -- Steel Rods in WH Production
   (2,  1,  80.000),  -- Steel Sheet in WH Main Stock
   (3,  1,  35.000),  -- Aluminum Angle in WH Main Stock
@@ -84,23 +84,23 @@ INSERT INTO stock_quants (product_id, location_id, quantity) VALUES
   (5,  1,  22.000),  -- Mesh Chair in WH Main Stock
   (5,  2,   8.000),  -- Mesh Chair in WH Rack A
   (6,  1,   6.000),  -- Oak Desk in WH Main Stock (Low stock)
-  (7,  1,  14.000),  -- Drawer in WH Main Stock
+  (7,  1,  15.000),  -- Drawer in WH Main Stock
   (8,  1,  15.000),  -- 24" Monitor in WH Main Stock
   (8,  7,   8.000),  -- 24" Monitor in WH2
-  (9,  1,  25.000),  -- Keyboard in WH Main Stock
-  (10, 1,  40.000),  -- Mouse in WH Main Stock
+  (9,  1,  30.000),  -- Keyboard in WH Main Stock
+  (10, 1,  50.000),  -- Mouse in WH Main Stock
   (11, 1,   4.000),  -- Cat6 Cable in WH Main Stock (Low stock)
   (12, 1, 180.000),  -- Boxes in WH Main Stock
-  (12, 7, 350.000),  -- Boxes in WH2 General Stock
+  (12, 7, 400.000),  -- Boxes in WH2 General Stock
   (13, 1,  60.000),  -- Tape in WH Main Stock
   (14, 1,  12.000),  -- Bubble Wrap in WH Main Stock
-  (15, 7,  45.000),  -- Stretch Film in WH2
-  (16, 3, 850.000),  -- Hex Bolts in WH Rack B
-  (17, 3, 900.000),  -- Lock Nuts in WH Rack B
+  (15, 7,  50.000),  -- Stretch Film in WH2
+  (16, 3, 1000.000), -- Hex Bolts in WH Rack B
+  (17, 3, 1000.000), -- Lock Nuts in WH Rack B
   (18, 1,  28.000),  -- Helmets in WH Main Stock
   (19, 1,  50.000),  -- Vests in WH Main Stock
   (20, 1,  75.000)   -- Gloves in WH Main Stock
-ON CONFLICT (product_id, location_id) DO UPDATE SET quantity = EXCLUDED.quantity;
+ON CONFLICT (product_id, location_id) DO NOTHING;
 
 -- Reordering Rules (Automated min/max replenishment triggers)
 INSERT INTO reorder_rules (id, product_id, warehouse_id, min_qty, max_qty) VALUES
@@ -128,7 +128,7 @@ INSERT INTO operations (
   (2,  'WH/IN/0002', 'receipt', 'done', 1, NULL, 1, 'Comfort Works Furniture',    now() - interval '6 days', 1, 'Quarterly furniture shipment', now() - interval '6 days', 1, now() - interval '6 days'),
   (3,  'WH/IN/0003', 'receipt', 'done', 1, NULL, 1, 'Dell Technologies India',   now() - interval '5 days', 1, 'Displays and IT input', now() - interval '5 days', 1, now() - interval '5 days'),
   (4,  'WH2/IN/0001','receipt', 'done', 2, NULL, 7, 'PackRight Logistics',        now() - interval '4 days', 1, 'Warehousing bulk boxes', now() - interval '4 days', 1, now() - interval '4 days'),
-  (5,  'WH/IN/0004', 'receipt', 'done', 1, NULL, 1, 'Unbrako Fasteners Corp',     now() - interval '3 days', 1, 'Hardware & fasteners batch', now() - interval '3 days', 1, now() - interval '3 days'),
+  (5,  'WH/IN/0004', 'receipt', 'done', 1, NULL, 3, 'Unbrako Fasteners Corp',     now() - interval '3 days', 1, 'Hardware & fasteners batch', now() - interval '3 days', 1, now() - interval '3 days'),
   -- Completed Transfers
   (6,  'WH/INT/0001','internal','done', 1, 1,    4, NULL,                         now() - interval '4 days', 2, 'Allocated steel for fabrication', now() - interval '4 days', 2, now() - interval '4 days'),
   (7,  'WH/INT/0002','internal','done', 1, 1,    2, NULL,                         now() - interval '2 days', 3, 'Chairs moved to high rack', now() - interval '2 days', 3, now() - interval '2 days'),
@@ -139,7 +139,7 @@ INSERT INTO operations (
   (10, 'WH/ADJ/0001','adjustment','done',1, 1,   1, NULL,                         now() - interval '1 day',  2, 'Cycle count discrepancy correction', now() - interval '1 day', 2, now() - interval '1 day'),
   -- Pending / Active Operations
   (11, 'WH/IN/0005', 'receipt', 'ready',   1, NULL, 1, 'Schneider Electric India', now() + interval '1 day',  4, 'Emergency electrical & cabling replenishment', NULL, 4, now()),
-  (12, 'WH/IN/0006', 'receipt', 'waiting', 1, NULL, 1, 'Tata Steel Ltd',            now() + interval '3 days', 1, 'Scheduled monthly raw rebar delivery', NULL, 1, now()),
+  (12, 'WH/IN/0006', 'receipt', 'ready',   1, NULL, 1, 'Tata Steel Ltd',            now() + interval '3 days', 1, 'Scheduled monthly raw rebar delivery', NULL, 1, now()),
   (13, 'WH/IN/0007', 'receipt', 'draft',   1, NULL, 1, '3M Safety Solutions',      now() + interval '4 days', 1, 'PPE restock order', NULL, 1, now()),
   (14, 'WH/OUT/0003','delivery','ready',   1, 1, NULL, 'Flipkart Fulfillment Hub',  now() + interval '5 hours',1, 'Urgent customer dispatch', NULL, 1, now()),
   (15, 'WH/OUT/0004','delivery','waiting', 1, 1, NULL, 'Acme Engineering Corp',    now() + interval '2 days', 1, 'Waiting on client pickup truck', NULL, 1, now()),
@@ -233,7 +233,7 @@ INSERT INTO sequences (key, last_value) VALUES
   ('WH/ADJ', 1),
   ('WH2/IN', 1),
   ('WH2/INT', 1)
-ON CONFLICT (key) DO UPDATE SET last_value = EXCLUDED.last_value;
+ON CONFLICT (key) DO UPDATE SET last_value = GREATEST(sequences.last_value, EXCLUDED.last_value);
 
 -- Advance identity sequences past seed IDs
 SELECT setval(pg_get_serial_sequence('users', 'id'), coalesce(max(id), 1)) FROM users;
