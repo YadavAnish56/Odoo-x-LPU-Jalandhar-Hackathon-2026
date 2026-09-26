@@ -435,6 +435,6 @@ adjustments, the stock ledger, and the dashboard KPIs and filters. [Tester.md](T
 | Yadav Anish | Backend, integration and deployment | [@YadavAnish56](https://github.com/YadavAnish56) |
 | Bhupendra Sharma | Frontend | [@bhupendrasharmaX](https://github.com/bhupendrasharmaX) |
 | Niraj | Database | [@Niraj-145](https://github.com/Niraj-145) |
-| Jiya Raisinghani | Testing | |
+| Jiya Raisinghani | Testing | [@jixiicode](https://github.com/jixiicode) |
 
 <p align="center"><sub>Built for the Odoo x LPU Jalandhar Hackathon 2026</sub></p>
