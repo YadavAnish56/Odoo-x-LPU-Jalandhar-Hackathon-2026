@@ -36,7 +36,7 @@ Base URL (local): `http://localhost:5000/api`
 | POST | `/auth/login` | `{ email, password }` | `{ token, user }` |
 | GET | `/auth/me` | – | `user` |
 | POST | `/auth/logout` | – | `{ message }` (all tokens of the user stop working) |
-| POST | `/auth/forgot-password` | `{ email }` | `{ message, devOtp? }` |
+| POST | `/auth/forgot-password` | `{ email }` | `{ message, devOtp?, demoAccount? }` |
 | POST | `/auth/verify-otp` | `{ email, otp }` | `{ valid: true }` or 400 |
 | POST | `/auth/reset-password` | `{ email, otp, newPassword }` | `{ message }` |
 
@@ -44,6 +44,9 @@ Base URL (local): `http://localhost:5000/api`
 - `user` = `{ id, name, email, role, createdAt }`
 - OTP: 6 digits, valid 10 minutes, max 5 wrong tries. Without SMTP configured (development) the
   response includes `devOtp` so you can test the screens without email.
+- Demo accounts (`DEMO_EMAILS`, by default manager@ and staff@stocksense.com) have no real inbox: their
+  response always includes `devOtp` and `demoAccount: true` (also in production), nothing is emailed, and a
+  new code can be asked for right away.
 
 **Reset password screens:** (1) enter email → `forgot-password`, (2) enter OTP → `verify-otp`,
 (3) enter new password → `reset-password`, then go to login.

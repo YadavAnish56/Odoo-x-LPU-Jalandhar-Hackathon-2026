@@ -48,6 +48,7 @@ The repo includes a [render.yaml](render.yaml) for [Render](https://render.com);
 
 Password reset emails: add `SMTP_HOST=smtp.gmail.com`, `SMTP_PORT=587`, `SMTP_USER` and `SMTP_PASS`
 (a Gmail app password) in Render → Environment. Without them the reset code is only written to Render's logs.
+The two demo accounts do not need email: their code is always shown on the screen.
 
 Free plan: the service sleeps after 15 minutes without visits; the next visit takes about a minute.
 
@@ -63,8 +64,9 @@ their passwords (My Profile or Forgot password with OTP), the sign-in screen sho
 browser, and an open sign-in tab updates immediately. New sign-ups: the first account becomes the Inventory Manager,
 later accounts join as Warehouse Staff (a manager can change roles in **Settings → Warehouses → Users & roles**).
 
-**Password reset (OTP):** without an email server configured, the 6-digit OTP is shown on the screen and in the
-backend console (development mode). Add SMTP settings in `backend/.env` to send real emails.
+**Password reset (OTP):** the demo email addresses are not real inboxes, so for these two accounts the 6-digit OTP
+is shown on the screen, on the live site too. Other accounts get it by email once SMTP is set up in `backend/.env`;
+without SMTP it is shown on the screen and in the backend console (development mode).
 
 ---
 

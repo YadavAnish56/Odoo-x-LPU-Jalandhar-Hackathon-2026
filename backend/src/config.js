@@ -41,6 +41,12 @@ export const config = {
     maxAttempts: 5,
     resendCooldownSeconds: 60,
   },
+  // Public demo accounts (their passwords are shown on the sign-in page). Their reset code is
+  // shown on screen instead of being emailed. DEMO_EMAILS= (empty) turns this off.
+  demoEmails: (process.env.DEMO_EMAILS ?? 'manager@stocksense.com,staff@stocksense.com')
+    .split(',')
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean),
   smtp: {
     enabled: Boolean(smtpHost),
     host: smtpHost,

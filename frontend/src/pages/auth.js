@@ -6,7 +6,7 @@ import { esc, INPUT, LABEL, showToast } from '../utils.js';
 
 let authView = 'login'; // login | signup | forgot | otp | reset
 let onLoginHandler = () => {};
-const reset = { email: '', otp: '', devOtp: '' };
+const reset = { email: '', otp: '', devOtp: '', demo: false };
 let resendTimer = null;
 
 const SUBMIT = 'w-full h-10 rounded-md bg-primary-container hover:bg-primary-container/90 text-on-primary text-[14px] font-medium transition-colors disabled:opacity-60';
@@ -122,8 +122,8 @@ function forgotView() {
 function otpView() {
   return `
     <h1 class="text-[18px] font-semibold mb-1">Enter code</h1>
-    <p class="text-[13px] text-secondary mb-5">Sent to <span class="text-on-surface font-medium">${esc(reset.email)}</span></p>
-    ${reset.devOtp ? `<p class="mb-4 rounded-md bg-info-soft text-info px-3 py-2 text-[13px]">Email is not set up, so here is your code: <span class="font-mono font-semibold tracking-widest">${esc(reset.devOtp)}</span></p>` : ''}
+    <p class="text-[13px] text-secondary mb-5">${reset.demo ? 'For' : 'Sent to'} <span class="text-on-surface font-medium">${esc(reset.email)}</span></p>
+    ${reset.devOtp ? `<p class="mb-4 rounded-md bg-info-soft text-info px-3 py-2 text-[13px]">${reset.demo ? 'This demo account has no real inbox' : 'Email is not set up'}, so here is your code: <span class="font-mono font-semibold tracking-widest">${esc(reset.devOtp)}</span></p>` : ''}
     <form id="otp-form" class="flex flex-col gap-4">
       <div class="flex items-center justify-between gap-2">
         ${[1, 2, 3, 4, 5, 6].map(() => `<input type="text" inputmode="numeric" maxlength="1" autocomplete="one-time-code" class="otp-input w-full h-12 text-center text-[20px] font-semibold rounded-md border border-surface-container-high bg-surface-container-lowest outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20"/>`).join('')}
@@ -213,6 +213,7 @@ function wireAuthEvents() {
     const res = await api.post('/auth/forgot-password', { email });
     reset.email = email.trim().toLowerCase();
     reset.devOtp = res.devOtp || '';
+    reset.demo = Boolean(res.demoAccount);
     go('otp');
   });
 
@@ -254,7 +255,7 @@ function wireAuthEvents() {
       try {
         const res = await api.post('/auth/forgot-password', { email: reset.email });
         reset.devOtp = res.devOtp || reset.devOtp;
-        showToast('A new code has been sent', 'info');
+        showToast(reset.demo ? 'Here is a new code' : 'A new code has been sent', 'info');
         go('otp');
       } catch (err) {
         showToast(errorMessage(err), 'error');
@@ -277,6 +278,7 @@ function wireAuthEvents() {
     rememberDemoPassword(reset.email, password);
     reset.otp = '';
     reset.devOtp = '';
+    reset.demo = false;
     showToast('Password changed. Sign in with your new password.');
     go('login');
   });

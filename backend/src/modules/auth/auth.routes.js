@@ -87,6 +87,7 @@ router.post('/logout', requireAuth, async (req, res) => {
 });
 
 // POST /api/auth/forgot-password - sends a 6 digit OTP to the email.
+// The public demo accounts have no real inbox, so their OTP is returned to be shown on screen.
 router.post(
   '/forgot-password',
   limiter(10),
@@ -98,13 +99,17 @@ router.post(
     const { rows } = await query('SELECT id, name, email FROM users WHERE email = $1', [req.body.email]);
     const user = rows[0];
     if (!user) return res.json(response);
+    const demoAccount = config.demoEmails.includes(user.email);
 
-    const recent = await query(
-      `SELECT 1 FROM password_reset_otps
-       WHERE user_id = $1 AND used_at IS NULL AND created_at > now() - make_interval(secs => $2)`,
-      [user.id, config.otp.resendCooldownSeconds],
-    );
-    if (recent.rowCount) return res.json(response);
+    // The wait between codes only protects inboxes, and nothing is emailed for a demo account.
+    if (!demoAccount) {
+      const recent = await query(
+        `SELECT 1 FROM password_reset_otps
+         WHERE user_id = $1 AND used_at IS NULL AND created_at > now() - make_interval(secs => $2)`,
+        [user.id, config.otp.resendCooldownSeconds],
+      );
+      if (recent.rowCount) return res.json(response);
+    }
 
     const otp = String(crypto.randomInt(0, 1_000_000)).padStart(6, '0');
     await withTransaction(async (client) => {
@@ -117,6 +122,10 @@ router.post(
         [user.id, hashOtp(otp), config.otp.expiryMinutes],
       );
     });
+
+    if (demoAccount) {
+      return res.json({ message: 'Demo account: the OTP is shown instead of emailed.', devOtp: otp, demoAccount });
+    }
 
     try {
       await sendOtpEmail(user, otp);

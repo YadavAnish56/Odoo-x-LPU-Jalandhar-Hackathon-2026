@@ -21,6 +21,7 @@ before(async () => {
   process.env.NODE_ENV = 'test';
   process.env.DATABASE_URL = testDbUrl;
   process.env.JWT_SECRET = 'test-secret';
+  process.env.DEMO_EMAILS = 'demo@example.com';
   delete process.env.SMTP_HOST;
 
   const { initDatabase } = await import('../src/db/init.js');
@@ -128,6 +129,34 @@ describe('StockSense API', { skip }, () => {
     const login = await api('POST', '/api/auth/login', { body: { email: 'sam@example.com', password: 'NewSecret456' } });
     assert.equal(login.status, 200);
     tokens.staff = login.body.token;
+  });
+
+  test('demo accounts get their OTP on screen, with no wait between codes', async () => {
+    const signup = await api('POST', '/api/auth/signup', {
+      body: { name: 'Demo Staff', email: 'demo@example.com', password: 'Secret123' },
+    });
+    assert.equal(signup.status, 201);
+
+    const first = await api('POST', '/api/auth/forgot-password', { body: { email: 'demo@example.com' } });
+    assert.equal(first.body.demoAccount, true);
+    assert.match(first.body.devOtp, /^\d{6}$/);
+
+    // Asking again right away gives a new code, and only the newest one works
+    const second = await api('POST', '/api/auth/forgot-password', { body: { email: 'Demo@Example.com' } });
+    assert.match(second.body.devOtp, /^\d{6}$/);
+    if (second.body.devOtp !== first.body.devOtp) {
+      const old = await api('POST', '/api/auth/verify-otp', { body: { email: 'demo@example.com', otp: first.body.devOtp } });
+      assert.equal(old.status, 400);
+    }
+    const good = await api('POST', '/api/auth/verify-otp', { body: { email: 'demo@example.com', otp: second.body.devOtp } });
+    assert.equal(good.status, 200);
+
+    // Other accounts still wait before they can get a new code
+    await api('POST', '/api/auth/forgot-password', { body: { email: 'sam@example.com' } });
+    const again = await api('POST', '/api/auth/forgot-password', { body: { email: 'sam@example.com' } });
+    assert.equal(again.status, 200);
+    assert.equal(again.body.devOtp, undefined);
+    assert.equal(again.body.demoAccount, undefined);
   });
 
   test('warehouse gets a default Stock location; staff cannot manage master data', async () => {

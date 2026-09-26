@@ -57,6 +57,7 @@ This is the working checklist for confirming the whole StockSense stack is actua
 - [ ] Manager role can do the manager-only actions: create, edit, and delete products, categories, warehouses, locations, and reordering rules, and change user roles
 - [ ] Staff role gets 403 on those manager-only actions (staff can still create, validate, and cancel operations, and make stock adjustments)
 - [ ] Password reset OTP is 6 digits, stored hashed, expires after 10 minutes (`OTP_EXPIRY_MINUTES`), and is blocked after 5 wrong attempts (a new OTP is needed); a new OTP can be requested at most once every 60 seconds
+- [ ] Forgot password for manager@stocksense.com or staff@stocksense.com shows the OTP on screen (these inboxes are not real), also on the live site, and a new code can be requested right away
 - [ ] The first account created with Sign Up becomes a manager; later sign-ups join as staff
 - [ ] Demo accounts work as expected:
   - [ ] manager@stocksense.com / Manager@123
