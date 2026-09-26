@@ -19,33 +19,11 @@ route('warehouses', (el) => renderWarehouses(el));
 route('ledger', (el) => renderLedger(el));
 route('settings', (el) => renderSettings(el));
 route('profile', (el) => renderProfile(el));
+// Dynamic route: #product-detail-3 shows product 3 and keeps "Products" highlighted
+route('product-detail-', (el, id) => renderProductDetail(el, parseInt(id)), 'products');
 
 // Initialize auth screen
 initAuth();
-
-// Handle dynamic routes (product detail)
-const originalHashChange = window.onhashchange;
-window.addEventListener('hashchange', () => {
-  const hash = window.location.hash.slice(1);
-  if (hash.startsWith('product-detail-')) {
-    const id = parseInt(hash.replace('product-detail-', ''));
-    const el = document.getElementById('app-content');
-    if (el) {
-      el.innerHTML = '';
-      renderProductDetail(el, id);
-      // Update nav
-      document.querySelectorAll('[data-nav-path]').forEach(nav => {
-        if (nav.dataset.navPath === 'products') {
-          nav.classList.add('bg-primary-container', 'text-on-primary-container', 'font-semibold');
-          nav.classList.remove('text-on-surface-variant');
-        } else {
-          nav.classList.remove('bg-primary-container', 'text-on-primary-container', 'font-semibold');
-          nav.classList.add('text-on-surface-variant');
-        }
-      });
-    }
-  }
-});
 
 // Start router
 startRouter();
@@ -124,7 +102,12 @@ searchInput?.addEventListener('input', (e) => {
   }
 
   if (!productHits.length && !opHits.length) {
-    html = '<div class="p-4 text-center text-secondary font-body-sm text-body-sm">No results found for "' + q + '"</div>';
+    // Set the typed text with textContent so it is never interpreted as HTML
+    const empty = document.createElement('div');
+    empty.className = 'p-4 text-center text-secondary font-body-sm text-body-sm';
+    empty.textContent = `No results found for "${q}"`;
+    searchResults.replaceChildren(empty);
+    return;
   }
 
   searchResults.innerHTML = html;

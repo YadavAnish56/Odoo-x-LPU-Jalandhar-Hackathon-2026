@@ -32,7 +32,7 @@ export default function renderProducts(container) {
           <div class="flex flex-wrap items-center gap-space-sm">
             <div class="relative flex items-center">
               <span class="material-symbols-outlined absolute left-3 text-secondary text-body-lg pointer-events-none">search</span>
-              <input id="product-search" class="pl-10 pr-4 py-2 w-72 md:w-80 bg-surface-container-lowest text-on-surface text-body-sm font-body-sm rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-container transition-all" placeholder="Search products by SKU or name..." type="text" value="${searchTerm}"/>
+              <input id="product-search" class="pl-10 pr-4 py-2 w-72 md:w-80 bg-surface-container-lowest text-on-surface text-body-sm font-body-sm rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-container transition-all" placeholder="Search products by SKU or name..." type="text"/>
             </div>
             <button id="add-product-btn" class="flex items-center gap-space-xs px-4 py-2 bg-primary-container hover:bg-primary text-on-primary font-label-md text-label-md rounded-xl shadow-md transition-all active:scale-[0.99]" type="button">
               <span class="material-symbols-outlined text-body-lg">add</span><span>Add Product</span>
@@ -102,9 +102,18 @@ export default function renderProducts(container) {
     });
 
     // Search
+    // The value is set here (not in the HTML) so quotes or < > in the search text are kept as plain text
     const searchInput = container.querySelector('#product-search');
     if (searchInput) {
-      searchInput.addEventListener('input', (e) => { searchTerm = e.target.value; render(); searchInput.focus(); });
+      searchInput.value = searchTerm;
+      searchInput.addEventListener('input', (e) => {
+        searchTerm = e.target.value;
+        render();
+        // render() replaced the input, so move focus and the cursor to the new one
+        const newInput = container.querySelector('#product-search');
+        newInput.focus();
+        newInput.setSelectionRange(searchTerm.length, searchTerm.length);
+      });
     }
 
     // Add product

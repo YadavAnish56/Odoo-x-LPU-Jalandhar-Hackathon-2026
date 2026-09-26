@@ -5,7 +5,8 @@ export default function renderProductDetail(container, productId) {
   const p = data.products.find(pr => pr.id === productId);
   if (!p) { container.innerHTML = `<div class="p-12 text-center"><p class="text-secondary">Product not found.</p><a href="#products" class="text-primary font-semibold mt-2 inline-block">← Back to Products</a></div>`; return; }
   const statusColor = p.status === 'Low Stock' ? 'orange' : p.status === 'Out of Stock' ? 'red' : 'green';
-  const movements = data.moveHistory.filter(m => m.product.toLowerCase().includes(p.name.toLowerCase().split(' ')[0]));
+  // Match the full product name: matching only the first word showed Steel Rod moves on Steel Sheet
+  const movements = data.moveHistory.filter(m => m.product === p.name);
 
   container.innerHTML = `
     <div class="flex flex-col w-full pb-16">

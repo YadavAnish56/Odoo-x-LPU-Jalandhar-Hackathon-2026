@@ -34,8 +34,7 @@ The application will be live at: **`http://localhost:3000/`**
 
 | Module | URL / Route | Description |
 |---|---|---|
-| **Marketing Landing Page** | `/landing.html` | High-fidelity product landing page with live telemetry simulation, bento grid, pricing, and demo scheduling. |
-| **Authentication** | `/#auth` | Split-screen authentication with login, signup, forgot password, OTP verification, and quick demo login. |
+| **Authentication** | `/` (shown on load) | Split-screen authentication with login, signup, forgot password, OTP verification, and quick demo login. |
 | **Dashboard** | `/#dashboard` | Real-time inventory KPIs, quick action modals, active corridor tracking, and live operations feed. |
 | **Product Catalog** | `/#products` | Visual grid with category filtering, real-time stock levels, live search, and Add Product modal. |
 | **Product Detail** | `/#product-detail-:id` | Deep SKU analytics, per-warehouse stock breakdowns, reorder thresholds, and adjustment modal. |

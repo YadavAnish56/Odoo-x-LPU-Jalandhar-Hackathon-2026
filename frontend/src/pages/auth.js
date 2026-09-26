@@ -1,6 +1,7 @@
 import { showToast } from '../utils.js';
 
 let authView = 'login'; // login | signup | forgot | otp | reset
+let otpPurpose = 'reset'; // signup | reset - where the OTP screen leads after verification
 
 function renderAuth() {
   const container = document.getElementById('auth-screen');
@@ -226,7 +227,12 @@ function wireAuthEvents() {
   if (signupForm) {
     signupForm.addEventListener('submit', (e) => {
       e.preventDefault();
+      if (signupForm.password.value !== signupForm.confirm.value) {
+        showToast('Passwords do not match', 'error');
+        return;
+      }
       showToast('Account created! Please verify your email.', 'success');
+      otpPurpose = 'signup';
       authView = 'otp';
       renderAuth();
     });
@@ -238,6 +244,7 @@ function wireAuthEvents() {
     forgotForm.addEventListener('submit', (e) => {
       e.preventDefault();
       showToast('Reset code sent to your email', 'info');
+      otpPurpose = 'reset';
       authView = 'otp';
       renderAuth();
     });
@@ -257,27 +264,46 @@ function wireAuthEvents() {
     });
     inputs[0]?.focus();
 
-    // Timer
-    let seconds = 30;
-    const timerEl = document.getElementById('resend-timer');
+    // Timer (restarted each time a new code is requested)
     const resendBtn = document.getElementById('resend-otp');
-    const iv = setInterval(() => {
-      seconds--;
-      if (timerEl) timerEl.textContent = seconds;
-      if (seconds <= 0) {
-        clearInterval(iv);
-        if (resendBtn) {
+    let iv;
+    function startResendTimer() {
+      let seconds = 30;
+      clearInterval(iv);
+      resendBtn.disabled = true;
+      resendBtn.innerHTML = 'Resend in <span id="resend-timer">30</span>s';
+      iv = setInterval(() => {
+        seconds--;
+        const timerEl = document.getElementById('resend-timer');
+        if (timerEl) timerEl.textContent = seconds;
+        if (seconds <= 0) {
+          clearInterval(iv);
           resendBtn.disabled = false;
           resendBtn.textContent = 'Resend Code';
         }
-      }
-    }, 1000);
+      }, 1000);
+    }
+    startResendTimer();
+
+    resendBtn.addEventListener('click', () => {
+      showToast('A new code has been sent to your email', 'info');
+      startResendTimer();
+    });
 
     otpForm.addEventListener('submit', (e) => {
       e.preventDefault();
+      if (![...inputs].every(inp => /^\d$/.test(inp.value))) {
+        showToast('Enter the full 6-digit code', 'error');
+        return;
+      }
       clearInterval(iv);
-      showToast('Code verified!', 'success');
-      authView = 'reset';
+      if (otpPurpose === 'signup') {
+        showToast('Email verified! You can now sign in.', 'success');
+        authView = 'login';
+      } else {
+        showToast('Code verified!', 'success');
+        authView = 'reset';
+      }
       renderAuth();
     });
   }
@@ -287,6 +313,10 @@ function wireAuthEvents() {
   if (resetForm) {
     resetForm.addEventListener('submit', (e) => {
       e.preventDefault();
+      if (resetForm.password.value !== resetForm.confirm.value) {
+        showToast('Passwords do not match', 'error');
+        return;
+      }
       showToast('Password reset successfully!', 'success');
       authView = 'login';
       renderAuth();

@@ -27,7 +27,7 @@ export default {
 
   // WAREHOUSES
   warehouses: [
-    { id: 1, name: 'Main Warehouse', products: 8, stockUnits: 1578, lowStockCount: 2, locations: ['Bay 04-A', 'Bay 06-B', 'Bay 02-C', 'Bay 08-D', 'Shelf C3', 'East Yard', 'West Depot'], capacity: 82 },
+    { id: 1, name: 'Main Warehouse', products: 8, stockUnits: 1570, lowStockCount: 2, locations: ['Bay 04-A', 'Bay 06-B', 'Bay 02-C', 'Bay 08-D', 'Shelf C3', 'East Yard', 'West Depot'], capacity: 82 },
     { id: 2, name: 'Production Floor', products: 2, stockUnits: 1620, lowStockCount: 0, locations: ['Rack 02', 'Rack 05'], capacity: 45 },
     { id: 3, name: 'Finished Goods Warehouse', products: 3, stockUnits: 63, lowStockCount: 1, locations: ['Section A', 'Section B', 'Section D'], capacity: 28 },
   ],
@@ -41,17 +41,17 @@ export default {
   // RECEIPTS
   receipts: [
     { id: 'REC-001', supplier: 'ABC Steel Suppliers', product: 'Steel Rod', sku: 'STL-001', qty: 100, unit: 'kg', destination: 'Main Warehouse', status: 'Done', date: '2025-09-26', statusColor: 'green' },
-    { id: 'REC-002', supplier: 'Global Components', product: 'Aluminum Ingot', sku: 'ALM-089', qty: 250, unit: 'kg', destination: 'Main Warehouse', status: 'In Inspection', date: '2025-09-25', statusColor: 'amber' },
+    { id: 'REC-002', supplier: 'Global Components', product: 'Aluminum Alloy 6061', sku: 'ALM-089', qty: 250, unit: 'kg', destination: 'Main Warehouse', status: 'In Inspection', date: '2025-09-25', statusColor: 'amber' },
     { id: 'REC-003', supplier: 'Metro Industrial Supplies', product: 'Hex Bolts M8', sku: 'BLT-008', qty: 5000, unit: 'pcs', destination: 'Main Warehouse', status: 'Pending', date: '2025-09-24', statusColor: 'gray' },
     { id: 'REC-004', supplier: 'ABC Steel Suppliers', product: 'Steel Sheet', sku: 'STL-002', qty: 200, unit: 'kg', destination: 'Main Warehouse', status: 'Draft', date: '2025-09-23', statusColor: 'gray' },
   ],
 
   // DELIVERY ORDERS
   deliveries: [
-    { id: 'DEL-001', customer: 'XYZ Manufacturing', product: 'Steel Rod', sku: 'STL-001', qty: 20, unit: 'pcs', source: 'Main Warehouse', status: 'Ready for Dispatch', date: '2025-09-26', statusColor: 'orange' },
-    { id: 'DEL-002', customer: 'Nova Industries', product: 'Industrial Valve', sku: 'VLV-204', qty: 4, unit: 'pcs', source: 'Main Warehouse', status: 'Dispatched', date: '2025-09-25', statusColor: 'green' },
-    { id: 'DEL-003', customer: 'TechBuild Pvt Ltd', product: 'Galvanized Pipe', sku: 'PIP-303', qty: 50, unit: 'pcs', source: 'Main Warehouse', status: 'Processing', date: '2025-09-24', statusColor: 'amber' },
-    { id: 'DEL-004', customer: 'XYZ Manufacturing', product: 'Copper Wire Reel', sku: 'CPR-031', qty: 35, unit: 'kg', source: 'Main Warehouse', status: 'In Transit', date: '2025-09-26', statusColor: 'orange' },
+    { id: 'DEL-001', customer: 'XYZ Manufacturing', product: 'Steel Rod', sku: 'STL-001', qty: 20, unit: 'kg', source: 'Main Warehouse', status: 'Ready for Dispatch', date: '2025-09-26', statusColor: 'orange' },
+    { id: 'DEL-002', customer: 'Nova Industries', product: 'Industrial Valve 2-Inch', sku: 'VLV-204', qty: 4, unit: 'pcs', source: 'Main Warehouse', status: 'Dispatched', date: '2025-09-25', statusColor: 'green' },
+    { id: 'DEL-003', customer: 'TechBuild Pvt Ltd', product: 'Galvanized Pipe 3m', sku: 'PIP-303', qty: 50, unit: 'pcs', source: 'Main Warehouse', status: 'Processing', date: '2025-09-24', statusColor: 'amber' },
+    { id: 'DEL-004', customer: 'XYZ Manufacturing', product: 'Copper Coil 12mm', sku: 'CPR-031', qty: 35, unit: 'kg', source: 'Main Warehouse', status: 'In Transit', date: '2025-09-26', statusColor: 'orange' },
   ],
 
   // INTERNAL TRANSFERS
@@ -71,25 +71,25 @@ export default {
   // MOVE HISTORY
   moveHistory: [
     { timestamp: '26 Sep, 14:22', ref: 'REC-001', operation: 'Receipt', product: 'Steel Rod', qty: '+100 kg', from: 'ABC Steel Suppliers', to: 'Main Warehouse', user: 'John D.', status: 'Done', opColor: 'green' },
-    { timestamp: '26 Sep, 11:05', ref: 'DEL-004', operation: 'Delivery', product: 'Copper Wire Reel', qty: '-35 kg', from: 'Main Warehouse', to: 'XYZ Manufacturing', user: 'Sarah K.', status: 'In Transit', opColor: 'orange' },
-    { timestamp: '25 Sep, 16:40', ref: 'TRF-012', operation: 'Transfer', product: 'Brass Fitting #4', qty: '40 kg', from: 'Main Warehouse', to: 'Production Rack 02', user: 'Mike R.', status: 'Done', opColor: 'blue' },
-    { timestamp: '24 Sep, 09:12', ref: 'ADJ-003', operation: 'Adjustment', product: 'Steel Plate Cold-Rolled', qty: '-3 kg', from: 'Main Warehouse', to: '—', user: 'QC Lead #88', status: 'Approved', opColor: 'gray' },
-    { timestamp: '23 Sep, 15:30', ref: 'REC-002', operation: 'Receipt', product: 'Aluminum Ingot', qty: '+250 kg', from: 'Global Alloys Co.', to: 'West Depot', user: 'John D.', status: 'In Inspection', opColor: 'green' },
+    { timestamp: '26 Sep, 11:05', ref: 'DEL-004', operation: 'Delivery', product: 'Copper Coil 12mm', qty: '-35 kg', from: 'Main Warehouse', to: 'XYZ Manufacturing', user: 'Sarah K.', status: 'In Transit', opColor: 'orange' },
+    { timestamp: '25 Sep, 16:40', ref: 'TRF-012', operation: 'Transfer', product: 'Steel Rod', qty: '40 kg', from: 'Main Warehouse', to: 'Production Rack 02', user: 'Mike R.', status: 'In Transit', opColor: 'blue' },
+    { timestamp: '24 Sep, 09:12', ref: 'ADJ-003', operation: 'Adjustment', product: 'Steel Rod', qty: '-3 kg', from: 'Main Warehouse', to: '—', user: 'QC Lead #88', status: 'Approved', opColor: 'gray' },
+    { timestamp: '23 Sep, 15:30', ref: 'REC-002', operation: 'Receipt', product: 'Aluminum Alloy 6061', qty: '+250 kg', from: 'Global Components', to: 'West Depot', user: 'John D.', status: 'In Inspection', opColor: 'green' },
     { timestamp: '22 Sep, 10:45', ref: 'TRF-011', operation: 'Transfer', product: 'Titanium Fasteners', qty: '200 pcs', from: 'Production Floor', to: 'Finished Goods', user: 'Lisa M.', status: 'Done', opColor: 'blue' },
-    { timestamp: '21 Sep, 08:00', ref: 'DEL-002', operation: 'Delivery', product: 'Industrial Valves', qty: '-4 pcs', from: 'West Depot', to: 'Apex Robotics', user: 'Sarah K.', status: 'Dispatched', opColor: 'orange' },
+    { timestamp: '21 Sep, 08:00', ref: 'DEL-002', operation: 'Delivery', product: 'Industrial Valve 2-Inch', qty: '-4 pcs', from: 'West Depot', to: 'Nova Industries', user: 'Sarah K.', status: 'Dispatched', opColor: 'orange' },
     { timestamp: '20 Sep, 14:10', ref: 'ADJ-002', operation: 'Adjustment', product: 'Precision Bearings', qty: '-12 pcs', from: 'Production Floor', to: '—', user: 'Floor Supervisor', status: 'Approved', opColor: 'gray' },
   ],
 
   // STOCK LEDGER
   stockLedger: [
     { date: '26 Sep 2025', ref: 'REC-001', operation: 'Receipt', product: 'Steel Rod', location: 'Main Warehouse', inQty: 100, outQty: 0, balance: 500, unit: 'kg', opColor: 'green' },
-    { date: '26 Sep 2025', ref: 'DEL-004', operation: 'Delivery', product: 'Copper Wire Reel', location: 'Main Warehouse', inQty: 0, outQty: 35, balance: 18, unit: 'kg', opColor: 'orange' },
+    { date: '26 Sep 2025', ref: 'DEL-004', operation: 'Delivery', product: 'Copper Coil 12mm', location: 'Main Warehouse', inQty: 0, outQty: 35, balance: 18, unit: 'kg', opColor: 'orange' },
     { date: '25 Sep 2025', ref: 'TRF-012', operation: 'Transfer Out', product: 'Steel Rod', location: 'Main Warehouse', inQty: 0, outQty: 40, balance: 300, unit: 'kg', opColor: 'blue' },
     { date: '25 Sep 2025', ref: 'TRF-012', operation: 'Transfer In', product: 'Steel Rod', location: 'Production Floor', inQty: 40, outQty: 0, balance: 240, unit: 'kg', opColor: 'blue' },
     { date: '24 Sep 2025', ref: 'ADJ-003', operation: 'Adjustment', product: 'Steel Rod', location: 'Main Warehouse', inQty: 0, outQty: 3, balance: 340, unit: 'kg', opColor: 'gray' },
-    { date: '23 Sep 2025', ref: 'REC-002', operation: 'Receipt', product: 'Aluminum Ingot', location: 'Main Warehouse', inQty: 250, outQty: 0, balance: 265, unit: 'kg', opColor: 'green' },
+    { date: '23 Sep 2025', ref: 'REC-002', operation: 'Receipt', product: 'Aluminum Alloy 6061', location: 'Main Warehouse', inQty: 250, outQty: 0, balance: 265, unit: 'kg', opColor: 'green' },
     { date: '22 Sep 2025', ref: 'TRF-011', operation: 'Transfer Out', product: 'Titanium Fasteners', location: 'Production Floor', inQty: 0, outQty: 200, balance: 1420, unit: 'pcs', opColor: 'blue' },
-    { date: '21 Sep 2025', ref: 'DEL-002', operation: 'Delivery', product: 'Industrial Valves', location: 'Main Warehouse', inQty: 0, outQty: 4, balance: 840, unit: 'pcs', opColor: 'orange' },
+    { date: '21 Sep 2025', ref: 'DEL-002', operation: 'Delivery', product: 'Industrial Valve 2-Inch', location: 'Main Warehouse', inQty: 0, outQty: 4, balance: 840, unit: 'pcs', opColor: 'orange' },
   ],
 
   // REORDERING RULES

@@ -3,6 +3,13 @@ import { operationIcon, statusBadge } from '../utils.js';
 
 export default function renderLedger(container) {
   let activeView = 'history'; // history | ledger
+  let searchTerm = '';
+
+  // Search box filters both tables by reference or product name
+  function matchesSearch(row) {
+    const q = searchTerm.toLowerCase().trim();
+    return !q || row.ref.toLowerCase().includes(q) || row.product.toLowerCase().includes(q);
+  }
 
   function render() {
     container.innerHTML = `
@@ -14,7 +21,7 @@ export default function renderLedger(container) {
             <p class="font-body-md text-body-md text-secondary mt-1">Every inventory movement, fully traceable and auditable.</p>
           </div>
           <div class="flex items-center gap-space-sm">
-            <div class="relative"><span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-secondary">search</span><input class="pl-9 pr-4 py-2 w-64 rounded-xl bg-surface-container-lowest text-on-surface text-body-sm font-body-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-container transition-all" placeholder="Search by ref, product..." type="text"/></div>
+            <div class="relative"><span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-secondary">search</span><input id="ledger-search" class="pl-9 pr-4 py-2 w-64 rounded-xl bg-surface-container-lowest text-on-surface text-body-sm font-body-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-container transition-all" placeholder="Search by ref, product..." type="text"/></div>
           </div>
         </div>
 
@@ -24,12 +31,20 @@ export default function renderLedger(container) {
           <button data-ledger-tab="ledger" class="px-space-md py-1.5 rounded-full font-label-md text-label-md transition-colors ${activeView === 'ledger' ? 'bg-primary-container text-white shadow-sm' : 'bg-surface-container-lowest hover:bg-surface-container text-secondary hover:text-on-surface'}">Stock Ledger</button>
         </div>
 
-        ${activeView === 'history' ? renderMoveHistory() : renderStockLedger()}
+        <div id="ledger-table">${activeView === 'history' ? renderMoveHistory() : renderStockLedger()}</div>
       </div>
     `;
 
     container.querySelectorAll('[data-ledger-tab]').forEach(btn => {
       btn.addEventListener('click', () => { activeView = btn.dataset.ledgerTab; render(); });
+    });
+
+    const searchInput = container.querySelector('#ledger-search');
+    searchInput.value = searchTerm;
+    searchInput.addEventListener('input', () => {
+      searchTerm = searchInput.value;
+      // Only the table is redrawn, so the search box keeps focus while typing
+      container.querySelector('#ledger-table').innerHTML = activeView === 'history' ? renderMoveHistory() : renderStockLedger();
     });
   }
 
@@ -42,7 +57,7 @@ export default function renderLedger(container) {
               <th class="py-3 px-4 rounded-l-xl">Timestamp</th><th class="py-3 px-4">Reference</th><th class="py-3 px-4">Operation</th><th class="py-3 px-4">Product</th><th class="py-3 px-4 text-right">Quantity</th><th class="py-3 px-4">From</th><th class="py-3 px-4">To</th><th class="py-3 px-4">User</th><th class="py-3 px-4 rounded-r-xl text-right">Status</th>
             </tr></thead>
             <tbody class="font-body-sm text-body-sm text-on-surface">
-              ${data.moveHistory.map(m => `
+              ${data.moveHistory.filter(matchesSearch).map(m => `
                 <tr class="hover:bg-surface-container-low/70 transition-colors">
                   <td class="py-3.5 px-4 text-secondary font-mono">${m.timestamp}</td>
                   <td class="py-3.5 px-4 font-mono font-semibold">${m.ref}</td>
@@ -70,7 +85,7 @@ export default function renderLedger(container) {
               <th class="py-3 px-4 rounded-l-xl">Date</th><th class="py-3 px-4">Reference</th><th class="py-3 px-4">Operation</th><th class="py-3 px-4">Product</th><th class="py-3 px-4">Location</th><th class="py-3 px-4 text-right">In</th><th class="py-3 px-4 text-right">Out</th><th class="py-3 px-4 rounded-r-xl text-right">Balance</th>
             </tr></thead>
             <tbody class="font-body-sm text-body-sm text-on-surface">
-              ${data.stockLedger.map(l => `
+              ${data.stockLedger.filter(matchesSearch).map(l => `
                 <tr class="hover:bg-surface-container-low/70 transition-colors">
                   <td class="py-3.5 px-4 text-secondary font-mono">${l.date}</td>
                   <td class="py-3.5 px-4 font-mono font-semibold">${l.ref}</td>

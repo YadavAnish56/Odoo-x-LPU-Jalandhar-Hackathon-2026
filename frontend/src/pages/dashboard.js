@@ -64,7 +64,7 @@ export default function renderDashboard(container) {
                   <div class="bg-primary-container h-full rounded-full transition-all duration-1000" style="width: 72%;"></div>
                 </div>
                 <div class="mt-2 flex items-center justify-between text-secondary font-label-sm text-label-sm">
-                  <span>Safety Threshold: 120 kg</span><span class="text-primary font-medium flex items-center gap-0.5">View details <span class="material-symbols-outlined text-[13px]">arrow_forward</span></span>
+                  <span>Safety Threshold: 100 kg</span><span class="text-primary font-medium flex items-center gap-0.5">View details <span class="material-symbols-outlined text-[13px]">arrow_forward</span></span>
                 </div>
               </div>
               <div class="absolute -bottom-4 -left-4 z-20 flex items-center gap-2 bg-surface-container-lowest text-on-surface px-3.5 py-2 rounded-xl shadow-lg font-label-sm text-label-sm backdrop-blur-md">
@@ -147,7 +147,7 @@ export default function renderDashboard(container) {
                 <line stroke="#f97316" stroke-dasharray="2 2" stroke-opacity="0.6" stroke-width="1" x1="560" x2="560" y1="50" y2="195"/>
               </svg>
               <div class="absolute top-4 left-[75%] -translate-x-1/2 bg-surface-container-lowest text-on-surface shadow-xl rounded-xl p-2.5 font-label-sm text-label-sm pointer-events-none">
-                <div class="text-secondary">Thu, 21 Sep</div>
+                <div class="text-secondary">Sun, 21 Sep</div>
                 <div class="font-semibold text-primary-container">+480 kg Peak Flow</div>
                 <div class="text-secondary text-[10px]">Main Warehouse Hub</div>
               </div>
@@ -201,11 +201,11 @@ export default function renderDashboard(container) {
             </div>
             <div class="mt-4 bg-surface-container-lowest rounded-xl p-4 shadow-sm">
               <div class="flex items-start justify-between">
-                <div><span class="font-label-sm text-label-sm font-mono text-secondary">STL-001</span><h4 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Steel Rod 12mm</h4></div>
-                <span class="px-2 py-0.5 rounded bg-error-container text-error font-label-sm text-label-sm font-semibold">-25% Deficit</span>
+                <div><span class="font-label-sm text-label-sm font-mono text-secondary">CPR-031</span><h4 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Copper Coil 12mm</h4></div>
+                <span class="px-2 py-0.5 rounded bg-error-container text-error font-label-sm text-label-sm font-semibold">-64% Deficit</span>
               </div>
               <div class="mt-3 flex items-baseline justify-between">
-                <div><div class="font-headline-md text-headline-md text-primary font-semibold">15 kg</div><div class="font-body-sm text-body-sm text-secondary">Safety Min: 20 kg</div></div>
+                <div><div class="font-headline-md text-headline-md text-primary font-semibold">18 kg</div><div class="font-body-sm text-body-sm text-secondary">Safety Min: 50 kg</div></div>
                 <button onclick="window.location.hash='#products'" class="px-4 py-2 rounded-xl bg-primary-container hover:bg-primary text-on-primary font-label-md text-label-md font-semibold transition-all shadow-sm">Review Stock</button>
               </div>
             </div>
@@ -282,7 +282,7 @@ export default function renderDashboard(container) {
                     <td class="py-3.5 px-4"><span class="inline-flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px] ${opIconColor(m.opColor)}">${opIcon(m.operation)}</span>${m.operation}</span></td>
                     <td class="py-3.5 px-4 font-medium">${m.product}</td>
                     <td class="py-3.5 px-4 text-right font-mono font-semibold ${m.qty.startsWith('+') ? 'text-emerald-600' : m.qty.startsWith('-') ? 'text-error' : 'text-on-surface'}">${m.qty}</td>
-                    <td class="py-3.5 px-4 text-secondary">${m.to !== '—' ? m.to : m.from}</td>
+                    <td class="py-3.5 px-4 text-secondary">${m.operation === 'Delivery' || m.to === '—' ? m.from : m.to}</td>
                     <td class="py-3.5 px-4">${statusBadgeSmall(m.status, m.opColor)}</td>
                     <td class="py-3.5 px-4 text-right text-secondary font-mono">${m.timestamp}</td>
                   </tr>

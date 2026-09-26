@@ -213,7 +213,6 @@ export default function renderOperations(container) {
     const menu = container.querySelector('#create-op-menu');
     if (trigger && menu) {
       trigger.addEventListener('click', (e) => { e.stopPropagation(); menu.classList.toggle('hidden'); });
-      document.addEventListener('click', (e) => { if (!menu.contains(e.target) && !trigger.contains(e.target)) menu.classList.add('hidden'); });
     }
 
     // Create operations
@@ -252,7 +251,17 @@ export default function renderOperations(container) {
     ]);
   }
 
+  // Close the create menu on outside clicks. Added once per page visit (not on every
+  // tab re-render) and removed by the router when leaving the page.
+  function closeMenuOnOutsideClick(e) {
+    const trigger = container.querySelector('#create-op-trigger');
+    const menu = container.querySelector('#create-op-menu');
+    if (menu && !menu.contains(e.target) && !trigger?.contains(e.target)) menu.classList.add('hidden');
+  }
+  document.addEventListener('click', closeMenuOnOutsideClick);
+
   render();
+  return () => document.removeEventListener('click', closeMenuOnOutsideClick);
 }
 
 function transferNode(label, icon, name, detail, pct, color) {
