@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" width="1200" height="400" role="img" aria-labelledby="title desc">
+  <title id="title">StockSense</title>
+  <desc id="desc">StockSense, inventory management for the Odoo x LPU Jalandhar Hackathon 2026. Stock flows from a vendor into the warehouse, to a rack and out to a customer.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0B0B0E"/>
+      <stop offset="1" stop-color="#17110D"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#F97316" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#F97316" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="dots" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#FFFFFF" fill-opacity="0.05"/>
+    </pattern>
+    <clipPath id="card"><rect width="1200" height="400" rx="24"/></clipPath>
+  </defs>
+  <style>
+    .sans { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+    .mono { font-family: ui-monospace, SFMono-Regular, 'Cascadia Mono', Consolas, 'Liberation Mono', monospace; }
+    .title { font-size: 56px; font-weight: 700; fill: #FAFAFA; letter-spacing: -1px; }
+    .tagline { font-size: 21px; fill: #A1A1AA; }
+    .pill { font-size: 12.5px; font-weight: 600; fill: #FDBA74; letter-spacing: 0.8px; }
+    .node-name { font-size: 16px; font-weight: 600; fill: #F4F4F5; }
+    .node-sub { font-size: 13px; fill: #A1A1AA; }
+    .edge-name { font-size: 13px; font-weight: 600; fill: #FB923C; }
+    .edge-ref { font-size: 12px; fill: #71717A; }
+    .caption { font-size: 15px; fill: #8B8B94; }
+    .flow { stroke: #52525B; stroke-width: 2; stroke-dasharray: 5 7; fill: none; animation: dash 1s linear infinite; }
+    .rise1, .rise2, .rise3 { animation: rise 0.8s ease-out both; }
+    .rise2 { animation-delay: 0.15s; }
+    .rise3 { animation-delay: 0.3s; }
+    @keyframes dash { to { stroke-dashoffset: -12; } }
+    @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @media (prefers-reduced-motion: reduce) {
+      .flow, .rise1, .rise2, .rise3 { animation: none; }
+      .pkg { display: none; }
+    }
+  </style>
+
+  <g clip-path="url(#card)">
+    <rect width="1200" height="400" fill="url(#bg)"/>
+    <rect width="1200" height="400" fill="url(#dots)"/>
+    <circle cx="1060" cy="20" r="380" fill="url(#glow)"/>
+  </g>
+  <rect x="0.5" y="0.5" width="1199" height="399" rx="23.5" fill="none" stroke="#27272A"/>
+
+  <!-- Logo, name and tagline -->
+  <g class="rise1">
+    <g transform="translate(60 56) scale(1.5)">
+      <rect width="48" height="48" rx="14" fill="#FFF1E8"/>
+      <rect x="12" y="12" width="10" height="10" rx="3.5" fill="#F97316"/>
+      <rect x="26" y="12" width="10" height="10" rx="3.5" fill="#F97316" fill-opacity="0.35"/>
+      <rect x="12" y="26" width="10" height="10" rx="3.5" fill="#F97316" fill-opacity="0.7"/>
+      <path d="M26 31C26 28.2386 28.2386 26 31 26H36V31C36 33.7614 33.7614 36 31 36C28.2386 36 26 33.7614 26 31Z" fill="#F97316"/>
+      <path d="M29 31L33 31M33 31L31 29M33 31L31 33" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <text x="154" y="112" class="sans title">StockSense</text>
+  </g>
+  <text x="60" y="178" class="sans tagline rise2">Every stock movement in one real-time app: receipts, deliveries, transfers and counts.</text>
+
+  <g class="rise1">
+    <rect x="780" y="58" width="360" height="34" rx="17" fill="#F97316" fill-opacity="0.1" stroke="#F97316" stroke-opacity="0.55"/>
+    <text x="960" y="80" text-anchor="middle" class="sans pill">ODOO x LPU JALANDHAR HACKATHON 2026</text>
+  </g>
+
+  <!-- Stock flow: vendor -> warehouse -> rack -> customer (6 second loop) -->
+  <g class="rise3">
+    <path class="flow" d="M240 286 H352"/>
+    <path class="flow" d="M540 286 H652"/>
+    <path class="flow" d="M840 286 H952"/>
+    <path d="M346 280 L353 286 L346 292 M646 280 L653 286 L646 292 M946 280 L953 286 L946 292" fill="none" stroke="#52525B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <text x="300" y="268" text-anchor="middle" class="sans edge-name">Receipt</text>
+    <text x="600" y="268" text-anchor="middle" class="sans edge-name">Transfer</text>
+    <text x="900" y="268" text-anchor="middle" class="sans edge-name">Delivery</text>
+    <text x="300" y="314" text-anchor="middle" class="mono edge-ref">WH/IN</text>
+    <text x="600" y="314" text-anchor="middle" class="mono edge-ref">WH/INT</text>
+    <text x="900" y="314" text-anchor="middle" class="mono edge-ref">WH/OUT</text>
+
+    <rect x="60" y="244" width="180" height="84" rx="14" fill="#18181B" stroke="#3F3F46" stroke-width="1.5">
+      <animate attributeName="stroke" values="#F97316;#3F3F46" keyTimes="0;0.06" calcMode="discrete" dur="6s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="360" y="244" width="180" height="84" rx="14" fill="#18181B" stroke="#3F3F46" stroke-width="1.5">
+      <animate attributeName="stroke" values="#3F3F46;#F97316;#3F3F46" keyTimes="0;0.283;0.39" calcMode="discrete" dur="6s" repeatCount="indefinite"/>
+      <animate attributeName="fill" values="#18181B;#231710;#18181B" keyTimes="0;0.283;0.39" calcMode="discrete" dur="6s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="660" y="244" width="180" height="84" rx="14" fill="#18181B" stroke="#3F3F46" stroke-width="1.5">
+      <animate attributeName="stroke" values="#3F3F46;#F97316;#3F3F46" keyTimes="0;0.617;0.72" calcMode="discrete" dur="6s" repeatCount="indefinite"/>
+      <animate attributeName="fill" values="#18181B;#231710;#18181B" keyTimes="0;0.617;0.72" calcMode="discrete" dur="6s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="960" y="244" width="180" height="84" rx="14" fill="#18181B" stroke="#3F3F46" stroke-width="1.5">
+      <animate attributeName="stroke" values="#3F3F46;#F97316" keyTimes="0;0.95" calcMode="discrete" dur="6s" repeatCount="indefinite"/>
+      <animate attributeName="fill" values="#18181B;#231710" keyTimes="0;0.95" calcMode="discrete" dur="6s" repeatCount="indefinite"/>
+    </rect>
+
+    <text x="150" y="281" text-anchor="middle" class="sans node-name">Vendor</text>
+    <text x="150" y="303" text-anchor="middle" class="sans node-sub">supplier</text>
+    <text x="450" y="281" text-anchor="middle" class="mono node-name">WH/STOCK</text>
+    <text x="450" y="303" text-anchor="middle" class="sans node-sub">Main Warehouse</text>
+    <text x="750" y="281" text-anchor="middle" class="mono node-name">WH/RACK-A</text>
+    <text x="750" y="303" text-anchor="middle" class="sans node-sub">Rack A</text>
+    <text x="1050" y="281" text-anchor="middle" class="sans node-name">Customer</text>
+    <text x="1050" y="303" text-anchor="middle" class="sans node-sub">delivery</text>
+
+    <!-- Packages travelling along the flow -->
+    <g class="pkg" opacity="0">
+      <rect x="-11" y="-11" width="22" height="22" rx="6" fill="#F97316" fill-opacity="0.25"/>
+      <rect x="-7" y="-7" width="14" height="14" rx="3.5" fill="#F97316"/>
+      <animateMotion path="M240 286 H360" keyPoints="0;0;1;1" keyTimes="0;0.05;0.283;1" calcMode="linear" dur="6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;1;0" keyTimes="0;0.05;0.283" calcMode="discrete" dur="6s" repeatCount="indefinite"/>
+    </g>
+    <g class="pkg" opacity="0">
+      <rect x="-11" y="-11" width="22" height="22" rx="6" fill="#F97316" fill-opacity="0.25"/>
+      <rect x="-7" y="-7" width="14" height="14" rx="3.5" fill="#F97316"/>
+      <animateMotion path="M540 286 H660" keyPoints="0;0;1;1" keyTimes="0;0.383;0.617;1" calcMode="linear" dur="6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;1;0" keyTimes="0;0.383;0.617" calcMode="discrete" dur="6s" repeatCount="indefinite"/>
+    </g>
+    <g class="pkg" opacity="0">
+      <rect x="-11" y="-11" width="22" height="22" rx="6" fill="#F97316" fill-opacity="0.25"/>
+      <rect x="-7" y="-7" width="14" height="14" rx="3.5" fill="#F97316"/>
+      <animateMotion path="M840 286 H960" keyPoints="0;0;1;1" keyTimes="0;0.717;0.95;1" calcMode="linear" dur="6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;1;0" keyTimes="0;0.717;0.95" calcMode="discrete" dur="6s" repeatCount="indefinite"/>
+    </g>
+  </g>
+
+  <text x="600" y="370" text-anchor="middle" class="sans caption rise3">Every move is written to the stock ledger, and stock can never go below zero.</text>
+</svg>
