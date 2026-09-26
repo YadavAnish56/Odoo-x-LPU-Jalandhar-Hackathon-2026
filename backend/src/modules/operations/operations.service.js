@@ -29,6 +29,14 @@ const OPERATION_COLUMNS = `
   (SELECT COUNT(*) FROM operation_lines x WHERE x.operation_id = o.id) AS line_count,
   (SELECT COALESCE(SUM(x.quantity), 0) FROM operation_lines x WHERE x.operation_id = o.id) AS total_quantity`;
 
+// Compact product lines for list views: [{ productId, productName, sku, uom, quantity, systemQuantity }]
+const LINE_ITEMS_COLUMN = `
+  (SELECT COALESCE(json_agg(json_build_object(
+      'productId', x.product_id, 'productName', xp.name, 'sku', xp.sku, 'uom', xp.uom,
+      'quantity', x.quantity, 'systemQuantity', x.system_quantity) ORDER BY x.id), '[]'::json)
+   FROM operation_lines x JOIN products xp ON xp.id = x.product_id
+   WHERE x.operation_id = o.id) AS line_items`;
+
 const OPERATION_JOINS = `
   FROM operations o
   JOIN warehouses w ON w.id = o.warehouse_id
@@ -83,7 +91,7 @@ export async function listOperations(f) {
   const limit = where.param(f.limit);
   const offset = where.param((f.page - 1) * f.limit);
   const { rows } = await pool.query(
-    `SELECT ${OPERATION_COLUMNS}, COUNT(*) OVER() AS total_count
+    `SELECT ${OPERATION_COLUMNS}, ${LINE_ITEMS_COLUMN}, COUNT(*) OVER() AS total_count
      ${OPERATION_JOINS}
      ${where.toSql()}
      ORDER BY ${orderBy}

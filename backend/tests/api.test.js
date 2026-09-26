@@ -373,6 +373,38 @@ describe('StockSense API', { skip }, () => {
     assert.equal(badFilter.status, 400);
   });
 
+  test('operation lists include their product lines', async () => {
+    const res = await api('GET', '/api/operations?type=receipt&status=done', { token: tokens.manager });
+    const oldest = res.body.items.at(-1);
+    assert.deepEqual(oldest.lineItems.map((l) => l.sku).sort(), ['CHR-01', 'STL-01']);
+  });
+
+  test('stock ledger keeps a running balance per location', async () => {
+    const res = await api('GET', `/api/moves/ledger?productId=${ids.steel}&locationId=${ids.stock}&limit=100`, {
+      token: tokens.manager,
+    });
+    assert.equal(res.status, 200);
+    assert.equal(res.body.items[0].balance, await onHand(ids.steel, ids.stock));
+    const oldest = res.body.items.at(-1);
+    assert.deepEqual([oldest.quantityIn, oldest.balance], [50, 50]);
+
+    const transfer = await api('GET', `/api/moves/ledger?productId=${ids.steel}&type=internal`, {
+      token: tokens.manager,
+    });
+    assert.deepEqual(
+      transfer.body.items.map((r) => [r.locationId, r.quantityIn, r.quantityOut, r.balance]),
+      [[ids.stock, 0, 40, 110], [ids.rack, 40, 0, 40]],
+    );
+  });
+
+  test('dashboard movement series has one row per day', async () => {
+    const res = await api('GET', '/api/dashboard/movement?days=7', { token: tokens.manager });
+    assert.equal(res.status, 200);
+    assert.equal(res.body.length, 7);
+    const today = res.body.at(-1);
+    assert.ok(today.inbound > 0 && today.outbound > 0 && today.internal > 0, JSON.stringify(today));
+  });
+
   test('reorder rules drive low stock alerts and dashboard KPIs', async () => {
     const rule = await api('POST', '/api/reorder-rules', {
       token: tokens.manager,

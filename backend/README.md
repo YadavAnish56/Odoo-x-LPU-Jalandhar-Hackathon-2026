@@ -4,7 +4,8 @@ REST API for **StockSense**, a modular Inventory Management System (Odoo x LPU J
 
 **Stack:** Node.js (Express 5) · PostgreSQL · JWT auth · Zod validation
 
-All endpoints are documented in **[API.md](API.md)**.
+All endpoints are documented in **[API.md](API.md)**. The web app lives in [`../frontend`](../frontend);
+see the [root README](../README.md) to run both together with `npm run dev`.
 
 ## Features
 

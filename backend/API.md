@@ -88,6 +88,16 @@ Base URL (local): `http://localhost:5000/api`
 
 `GET /alerts/low-stock?warehouseId=&categoryId=` → every reorder rule at or below its minimum.
 
+`GET /dashboard/movement?days=30&warehouseId=` → one row per day (1–365 days, default 30) for the movement chart:
+
+```json
+[ { "date": "2026-09-20", "inbound": 160, "outbound": 0, "internal": 0 },
+  { "date": "2026-09-21", "inbound": 55, "outbound": 10, "internal": 40 } ]
+```
+
+`inbound` = quantity received from outside (receipts, adjustment gains), `outbound` = quantity that left
+(deliveries, adjustment losses), `internal` = quantity moved between locations.
+
 ## 4. Products
 
 | Method | Path | Body / Query | Returns |
@@ -250,6 +260,9 @@ only once per operation.
 `lines` is only included by `GET /operations/:id` and the action endpoints. `lines[].onHand` is the
 current stock at the source location (at the destination for receipts).
 
+List results (`GET /operations`, `GET /adjustments`) include a compact `lineItems` array instead:
+`[{ "productId": 5, "productName": "24\" LED Monitor", "sku": "ELC-MON-24", "uom": "Units", "quantity": 10, "systemQuantity": null }]`.
+
 ## 8. Stock adjustments
 
 Fix differences between recorded stock and a physical count. Adjustments are applied immediately (status `done`).
@@ -288,6 +301,22 @@ e.g. `-3` for 3 damaged units). In the result, `lines[].systemQuantity` is the s
 
 `direction`: `in` (entered the company: receipt / adjustment gain), `out` (left: delivery / adjustment loss),
 `internal` (moved between locations).
+
+### Stock ledger with running balance
+
+`GET /moves/ledger?productId=&locationId=&warehouseId=&categoryId=&type=&search=&dateFrom=&dateTo=&page=&limit=`
+
+One row per stock change **per location** (an internal transfer gives an "out" row at the source and an
+"in" row at the destination), newest first, with the product's balance in that location after the change:
+
+```json
+{ "items": [ {
+  "moveId": 4, "operationId": 5, "reference": "WH/INT/0001", "moveType": "internal", "createdAt": "...",
+  "productId": 1, "productName": "Steel Rods", "sku": "STL-ROD-01", "uom": "kg",
+  "locationId": 1, "locationCode": "WH/STOCK", "locationName": "Stock", "warehouseId": 1, "warehouseName": "Main Warehouse",
+  "quantityIn": 0, "quantityOut": 40, "balance": 60
+} ], "total": 12, "page": 1, "limit": 20, "totalPages": 1 }
+```
 
 ## 10. Settings: warehouses and locations
 

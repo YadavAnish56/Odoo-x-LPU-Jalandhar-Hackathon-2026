@@ -107,6 +107,42 @@ router.get('/dashboard', validate({ query: filterSchema }), async (req, res) => 
   });
 });
 
+// $1 = number of days, $2 = warehouseId (optional)
+const MOVEMENT_SQL = `
+  SELECT to_char(d.day, 'YYYY-MM-DD') AS date,
+    COALESCE(SUM(m.quantity) FILTER (WHERE m.direction = 'in'), 0) AS inbound,
+    COALESCE(SUM(m.quantity) FILTER (WHERE m.direction = 'out'), 0) AS outbound,
+    COALESCE(SUM(m.quantity) FILTER (WHERE m.direction = 'internal'), 0) AS internal
+  FROM generate_series(current_date - ($1::int - 1), current_date, interval '1 day') AS d(day)
+  LEFT JOIN (
+    SELECT mv.created_at::date AS day, mv.quantity,
+      CASE WHEN mv.from_location_id IS NULL THEN 'in'
+           WHEN mv.to_location_id IS NULL THEN 'out'
+           ELSE 'internal' END AS direction
+    FROM stock_moves mv
+    LEFT JOIN locations fl ON fl.id = mv.from_location_id
+    LEFT JOIN locations tl ON tl.id = mv.to_location_id
+    WHERE mv.created_at >= current_date - ($1::int - 1)
+      AND ($2::int IS NULL OR fl.warehouse_id = $2::int OR tl.warehouse_id = $2::int)
+  ) m ON m.day = d.day::date
+  GROUP BY d.day
+  ORDER BY d.day`;
+
+// GET /api/dashboard/movement?days=30&warehouseId=1 - daily quantities received / shipped / moved
+router.get(
+  '/dashboard/movement',
+  validate({
+    query: z.object({
+      days: z.preprocess((v) => (v === '' ? undefined : v), z.coerce.number().int().min(1).max(365).default(30)),
+      warehouseId: optionalId,
+    }),
+  }),
+  async (req, res) => {
+    const { rows } = await query(MOVEMENT_SQL, [req.validQuery.days, req.validQuery.warehouseId ?? null]);
+    res.json(camelize(rows));
+  },
+);
+
 // GET /api/alerts/low-stock?warehouseId=1 - reorder rules at or below their minimum
 router.get('/alerts/low-stock', validate({ query: filterSchema }), async (req, res) => {
   const { rows } = await query(ALERTS_SQL, [req.validQuery.warehouseId ?? null, req.validQuery.categoryId ?? null]);

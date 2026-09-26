@@ -161,6 +161,29 @@ async function seedOperations({ users, loc, prod }) {
   await cancelOperation(canceled.id);
 }
 
+/**
+ * The demo history above is created in a few milliseconds. Move each completed operation
+ * (and its stock moves) to the date it was scheduled for, so the dashboard chart, the ledger
+ * and the move history show a realistic week of activity.
+ */
+async function backdateHistory() {
+  await withTransaction(async (client) => {
+    await client.query(
+      `UPDATE operations SET scheduled_date = now() - interval '12 hours'
+       WHERE type = 'adjustment'`,
+    );
+    await client.query(
+      `UPDATE operations SET done_at = scheduled_date,
+         created_at = LEAST(created_at, scheduled_date - interval '2 hours'),
+         updated_at = scheduled_date
+       WHERE status = 'done'`,
+    );
+    await client.query(
+      `UPDATE stock_moves m SET created_at = o.done_at FROM operations o WHERE m.operation_id = o.id`,
+    );
+  });
+}
+
 export async function seed() {
   await initDatabase();
   const { rows } = await pool.query('SELECT COUNT(*) AS n FROM users');
@@ -169,6 +192,7 @@ export async function seed() {
     return false;
   }
   await seedOperations(await seedMasterData());
+  await backdateHistory();
   return true;
 }
 
