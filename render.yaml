@@ -7,6 +7,8 @@ services:
     name: stocksense
     runtime: node
     plan: free
+    # Keep the app and the database in the same region (create the Neon database in Singapore too).
+    region: singapore
     branch: main
     buildCommand: npm run setup && npm run build
     # Creates missing tables and adds the demo data (only into an empty database), then starts.

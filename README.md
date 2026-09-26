@@ -40,7 +40,7 @@ The backend serves the built frontend in production, so the whole app runs as **
 The repo includes a [render.yaml](render.yaml) for [Render](https://render.com); the database can be a free
 [Neon](https://neon.tech) PostgreSQL.
 
-1. **Neon:** create a project and copy its connection string (`postgresql://...neon.tech/neondb?sslmode=require`).
+1. **Neon:** create a project in the **Singapore** region (same as the app in render.yaml) and copy its connection string (`postgresql://...neon.tech/neondb?sslmode=require`).
 2. **Render:** New → Blueprint → select this repository. When asked, paste the Neon string as `DATABASE_URL`.
    Render builds with `npm run setup && npm run build` and starts with `npm run db:setup && npm start`
    (creates the tables and the demo data on the first start).
