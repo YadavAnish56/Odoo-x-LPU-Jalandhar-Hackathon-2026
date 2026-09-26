@@ -84,6 +84,8 @@ even when two people validate at the same time.
 
 - [backend/README.md](backend/README.md) — backend setup, scripts and database design (ER diagram)
 - [backend/API.md](backend/API.md) — every API endpoint with examples
+- [Database/](Database) — SQL scripts (schema, seed data, views) and setup notes from the database team
+- [Tester.md](Tester.md) — testing checklist
 
 ## Tests
 
