@@ -1,0 +1,23 @@
+# Render Blueprint (https://render.com/docs/blueprint-spec)
+# One free web service: it builds the frontend and runs the backend, which also serves the
+# frontend, so the whole app is on one URL. The PostgreSQL database is external (e.g. Neon):
+# paste its connection string as DATABASE_URL when Render asks for it.
+services:
+  - type: web
+    name: stocksense
+    runtime: node
+    plan: free
+    branch: main
+    buildCommand: npm run setup && npm run build
+    # Creates missing tables and adds the demo data (only into an empty database), then starts.
+    startCommand: npm run db:setup && npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "22"
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true

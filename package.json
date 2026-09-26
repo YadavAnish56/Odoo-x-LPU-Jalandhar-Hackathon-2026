@@ -3,15 +3,20 @@
   "version": "1.0.0",
   "private": true,
   "description": "StockSense - Modern Inventory Management System (Odoo x LPU Hackathon 2026)",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
-    "setup": "npm --prefix backend install && npm --prefix frontend install",
+    "setup": "npm --prefix backend install && npm --prefix frontend install --include=dev",
     "db:init": "npm --prefix backend run db:init",
     "db:seed": "npm --prefix backend run db:seed",
     "db:reset": "npm --prefix backend run db:reset",
+    "db:setup": "npm --prefix backend run db:init && npm --prefix backend run db:seed",
     "dev": "node scripts/dev.mjs",
     "dev:backend": "npm --prefix backend run dev",
     "dev:frontend": "npm --prefix frontend run dev",
     "build": "npm --prefix frontend run build",
+    "start": "npm --prefix backend start",
     "test": "npm --prefix backend test"
   }
 }

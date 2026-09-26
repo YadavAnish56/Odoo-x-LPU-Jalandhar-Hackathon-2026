@@ -15,10 +15,19 @@ function required(name, devDefault) {
 
 const smtpHost = process.env.SMTP_HOST || '';
 
+// Behind a hosting proxy (Render, Railway, Nginx...) the visitor's IP is in X-Forwarded-For.
+// TRUST_PROXY = number of proxies in front of the app, "true" or "false". Default: 1 in production.
+function trustProxy(value) {
+  if (value === undefined || value === '') return env === 'production' ? 1 : false;
+  if (value === 'true' || value === 'false') return value === 'true';
+  return Number(value);
+}
+
 export const config = {
   env,
   isProduction: env === 'production',
   port: Number(process.env.PORT) || 5000,
+  trustProxy: trustProxy(process.env.TRUST_PROXY),
   databaseUrl: required('DATABASE_URL', 'postgres://postgres:postgres@localhost:5432/stocksense'),
   jwtSecret: required('JWT_SECRET', 'dev-only-secret-change-me'),
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',

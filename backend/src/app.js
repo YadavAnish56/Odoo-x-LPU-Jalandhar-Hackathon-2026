@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
@@ -18,16 +20,48 @@ import stockRoutes from './modules/products/stock.routes.js';
 import usersRoutes from './modules/users/users.routes.js';
 import warehousesRoutes from './modules/warehouses/warehouses.routes.js';
 
+// The built frontend (npm run build). In production this server serves it too,
+// so the whole app runs on one URL: pages at /, API at /api.
+const FRONTEND_DIST = fileURLToPath(new URL('../../frontend/dist/', import.meta.url));
+
 export function createApp() {
   const app = express();
+  app.set('trust proxy', config.trustProxy);
 
-  app.use(helmet());
+  app.use(
+    helmet({
+      // The frontend loads Tailwind and Google Fonts from their CDNs and has small inline scripts.
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          scriptSrc: ["'self'", "'unsafe-inline'", 'https://cdn.tailwindcss.com'],
+          scriptSrcAttr: ["'unsafe-inline'"],
+          styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+          fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
+          imgSrc: ["'self'", 'data:'],
+          connectSrc: ["'self'"],
+        },
+      },
+    }),
+  );
   app.use(cors({ origin: config.corsOrigin }));
   app.use(express.json({ limit: '1mb' }));
 
-  app.get('/', (req, res) => {
-    res.json({ name: 'StockSense API', status: 'running', health: '/api/health' });
-  });
+  if (config.isProduction && existsSync(`${FRONTEND_DIST}index.html`)) {
+    app.use(
+      express.static(FRONTEND_DIST, {
+        setHeaders(res, filePath) {
+          // Built assets have a hash in their name and never change; pages must always be fresh.
+          if (/[\\/]assets[\\/]/.test(filePath)) res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+          else res.setHeader('Cache-Control', 'no-cache');
+        },
+      }),
+    );
+  } else {
+    app.get('/', (req, res) => {
+      res.json({ name: 'StockSense API', status: 'running', health: '/api/health' });
+    });
+  }
 
   app.get('/api/health', async (req, res) => {
     try {
