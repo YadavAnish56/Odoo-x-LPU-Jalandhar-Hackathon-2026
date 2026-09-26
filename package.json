@@ -1,9 +1,0 @@
-{
-  "name": "stocksense-hackathon-2026",
-  "version": "1.0.0",
-  "description": "StockSense - Modern Inventory Management System (Odoo x LPU Hackathon 2026)",
-  "scripts": {
-    "dev": "npm --prefix frontend run dev",
-    "build": "npm --prefix frontend run build"
-  }
-}
