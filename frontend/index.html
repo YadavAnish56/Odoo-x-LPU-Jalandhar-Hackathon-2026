@@ -31,18 +31,24 @@
     }
 
     /* Toast */
-    .toast {
+    #toast-container {
       position: fixed; bottom: 2rem; right: 2rem; z-index: 100;
+      display: flex; flex-direction: column; gap: 0.5rem; pointer-events: none;
+    }
+    .toast {
+      pointer-events: auto;
       padding: 0.75rem 1.25rem; border-radius: 0.75rem;
       font-size: 13px; font-weight: 500; color: white;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-      animation: slideUp 0.3s ease-out, fadeOut 0.3s ease-in 2.5s forwards;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      animation: slideUp 0.3s ease-out;
+      display: flex; align-items: center; gap: 0.6rem;
     }
-    .toast-success { background: #16a34a; }
-    .toast-error { background: #ef4444; }
-    .toast-info { background: #3b82f6; }
+    .toast-success { background: #059669; }
+    .toast-error { background: #dc2626; }
+    .toast-info { background: #2563eb; }
+    .toast-warning { background: #d97706; }
+    .toast-primary { background: #ea580c; }
     @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-    @keyframes fadeOut { to { opacity: 0; transform: translateY(-10px); } }
 
     /* Modal overlay */
     .modal-overlay {
@@ -114,10 +120,39 @@
             <span>Search catalog</span>
             <kbd class="px-1.5 py-0.5 bg-surface-container-lowest text-on-surface-variant rounded text-label-sm font-label-sm shadow-[0_1px_2px_rgba(0,0,0,0.05)]">⌘K</kbd>
           </button>
-          <button aria-label="Notifications" class="relative p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded-full transition-colors flex items-center justify-center" type="button">
-            <span class="material-symbols-outlined">notifications</span>
-            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-primary-container rounded-full"></span>
-          </button>
+          <!-- Notification Dropdown Wrapper -->
+          <div class="relative" id="notif-wrapper">
+            <button id="notif-trigger" aria-label="Notifications" class="relative p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded-full transition-colors flex items-center justify-center cursor-pointer" type="button">
+              <span class="material-symbols-outlined">notifications</span>
+              <span id="notif-badge" class="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-primary-container rounded-full ring-2 ring-white"></span>
+            </button>
+
+            <!-- Notification Dropdown Menu -->
+            <div id="notif-dropdown" class="hidden absolute right-0 mt-3 w-80 sm:w-96 bg-surface-container-lowest border border-surface-container-high/80 rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in duration-200">
+              <div class="p-4 border-b border-surface-container flex items-center justify-between bg-surface-container-low/40">
+                <div class="flex items-center gap-2">
+                  <span class="font-headline-sm text-headline-sm font-semibold text-on-surface">Notifications</span>
+                  <span id="notif-count-badge" class="px-2 py-0.5 rounded-full bg-primary-fixed text-primary font-label-sm text-label-sm font-semibold">3 Unread</span>
+                </div>
+                <button id="mark-all-read-btn" class="font-label-sm text-label-sm text-primary hover:text-primary-container font-semibold transition-colors cursor-pointer" type="button">
+                  Mark all as read
+                </button>
+              </div>
+
+              <!-- Notifications List -->
+              <div id="notif-list" class="max-h-80 overflow-y-auto divide-y divide-surface-container/60">
+                <!-- Populated dynamically via JS -->
+              </div>
+
+              <!-- Footer Link -->
+              <div class="p-3 bg-surface-container-low/60 border-t border-surface-container text-center">
+                <a href="#ledger" id="notif-view-all" class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary font-medium inline-flex items-center gap-1 transition-colors cursor-pointer">
+                  <span>View full activity log in Ledger</span>
+                  <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+                </a>
+              </div>
+            </div>
+          </div>
           <div class="relative flex items-center pl-1 cursor-pointer" onclick="window.location.hash='#profile'">
             <div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary font-label-md text-label-md font-semibold">RS</div>
             <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full shadow-[0_0_0_2px_#ffffff]"></span>

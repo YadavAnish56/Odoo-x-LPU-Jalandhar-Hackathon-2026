@@ -127,7 +127,10 @@ export default function renderProducts(container) {
         </div>
       `, [
         { id: 'cancel', label: 'Cancel', primary: false, handler: () => {} },
-        { id: 'save', label: 'Save Product', primary: true, handler: () => showToast('Product added successfully!') },
+        { id: 'save', label: 'Save Product', primary: true, handler: () => {
+          showToast('Product added successfully!');
+          window.addAppNotification?.('Product Created', 'New SKU catalog entry registered.', 'success', '#products');
+        }},
       ]);
     });
 
@@ -159,7 +162,10 @@ export default function renderProducts(container) {
           </div>
         `, [
           { id: 'cancel', label: 'Cancel', primary: false, handler: () => {} },
-          { id: 'save', label: 'Update Product', primary: true, handler: () => showToast(`${p.name} updated!`) },
+          { id: 'save', label: 'Update Product', primary: true, handler: () => {
+            showToast(`${p.name} updated!`);
+            window.addAppNotification?.('Product Updated', `${p.name} (${p.sku}) specifications updated.`, 'info', '#products');
+          }},
         ]);
       });
     });

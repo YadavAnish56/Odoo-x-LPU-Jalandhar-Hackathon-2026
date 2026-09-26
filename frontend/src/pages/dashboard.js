@@ -24,7 +24,7 @@ export default function renderDashboard(container) {
                 <span class="material-symbols-outlined text-[18px] transition-transform group-hover:rotate-90">add</span>
                 <span>New Operation</span>
               </button>
-              <button class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-surface-container-lowest hover:bg-surface-container-low text-on-surface font-label-md text-label-md transition-all shadow-sm active:scale-[0.99]" type="button">
+              <button onclick="window.addAppNotification ? window.addAppNotification('Report Exported', 'Inventory CSV export compiled and downloaded.', 'success', '#ledger') : null" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-surface-container-lowest hover:bg-surface-container-low text-on-surface font-label-md text-label-md transition-all shadow-sm active:scale-[0.99] cursor-pointer" type="button">
                 <span class="material-symbols-outlined text-[18px] text-secondary">file_download</span>
                 <span>Export Report</span>
               </button>
@@ -215,7 +215,7 @@ export default function renderDashboard(container) {
                 <div class="font-body-md text-body-md text-on-surface font-medium">Aluminum Alloy 6061</div>
                 <div class="font-body-sm text-body-sm text-error font-medium mt-0.5">15 kg left (Reorder: 40 kg)</div>
               </div>
-              <button class="p-2 rounded-lg bg-surface-container-low hover:bg-surface-container-high text-on-surface transition-colors" title="Quick PO"><span class="material-symbols-outlined text-[18px]">add_shopping_cart</span></button>
+              <button onclick="window.addAppNotification ? window.addAppNotification('PO Requisition Created', 'Draft PO created for Aluminum Alloy 6061 (40 kg) with Global Components.', 'primary', '#operations') : null" class="p-2 rounded-lg bg-surface-container-low hover:bg-surface-container-high text-on-surface transition-colors cursor-pointer" title="Quick PO"><span class="material-symbols-outlined text-[18px]">add_shopping_cart</span></button>
             </div>
           </div>
 
@@ -312,8 +312,11 @@ function kpiCard(title, value, unit, subtitle, icon, iconBg, iconColor, showLink
 }
 
 function quickAction(icon, title, subtitle, href = '#') {
+  const clickHandler = href !== '#' 
+    ? `window.location.hash='${href}'` 
+    : `window.addAppNotification ? window.addAppNotification('${title}', '${subtitle}', 'info', '#operations') : null`;
   return `
-    <button onclick="${href !== '#' ? `window.location.hash='${href}'` : ''}" class="w-full flex items-center justify-between p-3 rounded-xl bg-surface-container-low hover:bg-surface-container transition-all group text-left cursor-pointer" type="button">
+    <button onclick="${clickHandler}" class="w-full flex items-center justify-between p-3 rounded-xl bg-surface-container-low hover:bg-surface-container transition-all group text-left cursor-pointer" type="button">
       <div class="flex items-center gap-3">
         <span class="p-2 rounded-lg bg-surface-container-lowest text-primary-container shadow-sm group-hover:scale-105 transition-transform"><span class="material-symbols-outlined text-[20px]">${icon}</span></span>
         <div><div class="font-body-md text-body-md text-on-surface font-medium">${title}</div><div class="font-label-sm text-label-sm text-secondary">${subtitle}</div></div>

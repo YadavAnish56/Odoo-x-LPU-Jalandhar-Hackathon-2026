@@ -171,6 +171,7 @@ export default function renderProductDetail(container, productId) {
       { id: 'cancel', label: 'Cancel', primary: false, handler: () => {} },
       { id: 'confirm', label: 'Apply Adjustment', primary: true, handler: () => {
         showToast('Stock adjustment recorded & hashed in ledger!', 'success');
+        window.addAppNotification?.('Adjustment Committed', `Adjusted count for ${p.name} (${p.sku}).`, 'success', '#ledger');
         setTimeout(() => window.location.hash = '#ledger', 500);
       }},
     ]);

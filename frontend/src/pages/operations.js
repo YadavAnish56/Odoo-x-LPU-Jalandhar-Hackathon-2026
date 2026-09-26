@@ -241,8 +241,14 @@ export default function renderOperations(container) {
     };
     showModal(titles[type], `<div class="flex flex-col gap-4">${fields[type]}</div>`, [
       { id: 'cancel', label: 'Cancel', primary: false, handler: () => {} },
-      { id: 'draft', label: 'Save Draft', primary: false, handler: () => showToast(`${titles[type]} saved as draft`) },
-      { id: 'validate', label: type === 'adjustment' ? 'Apply Adjustment' : 'Validate', primary: true, handler: () => showToast(`${titles[type]} validated successfully!`) },
+      { id: 'draft', label: 'Save Draft', primary: false, handler: () => {
+        showToast(`${titles[type]} saved as draft`);
+        window.addAppNotification?.('Draft Operation Saved', `${titles[type]} recorded in pending queue.`, 'info', '#operations');
+      }},
+      { id: 'validate', label: type === 'adjustment' ? 'Apply Adjustment' : 'Validate', primary: true, handler: () => {
+        showToast(`${titles[type]} validated successfully!`);
+        window.addAppNotification?.('Operation Validated', `${titles[type]} completed and registered into ledger.`, 'success', '#ledger');
+      }},
     ]);
   }
 

@@ -116,4 +116,12 @@ export default {
     scheduledTransfers: 6,
     growthPercent: 8.4,
   },
+
+  // NOTIFICATIONS
+  notifications: [
+    { id: 1, title: 'Low Stock Alert', message: 'Aluminum Alloy 6061 is below buffer threshold (15 kg left).', time: '5m ago', type: 'warning', icon: 'warning', unread: true, link: '#products' },
+    { id: 2, title: 'Inbound Verified', message: 'PO #1084 (+100 kg Steel Rod) arrived at Main Bay 04.', time: '22m ago', type: 'success', icon: 'add_task', unread: true, link: '#operations' },
+    { id: 3, title: 'Corridor Transfer Active', message: '40 kg Steel Rod dispatched to Production Floor.', time: '1h ago', type: 'info', icon: 'sync_alt', unread: true, link: '#operations' },
+    { id: 4, title: 'Auto Reorder Drafted', message: 'Purchase requisition drafted for Copper Coil 12mm.', time: '3h ago', type: 'primary', icon: 'auto_mode', unread: false, link: '#warehouses' },
+  ],
 };

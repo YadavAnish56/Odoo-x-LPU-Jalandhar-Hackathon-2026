@@ -1,11 +1,32 @@
 // Utility helpers shared across pages
 export function showToast(message, type = 'success') {
-  const container = document.getElementById('toast-container');
+  let container = document.getElementById('toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toast-container';
+    document.body.appendChild(container);
+  }
   const toast = document.createElement('div');
   toast.className = `toast toast-${type}`;
-  toast.textContent = message;
+  const iconMap = {
+    success: 'check_circle',
+    error: 'error',
+    info: 'info',
+    warning: 'warning',
+    primary: 'notifications_active'
+  };
+  const icon = iconMap[type] || 'check_circle';
+  toast.innerHTML = `
+    <span class="material-symbols-outlined text-[18px] shrink-0">${icon}</span>
+    <span class="flex-1 leading-snug">${message}</span>
+  `;
   container.appendChild(toast);
-  setTimeout(() => toast.remove(), 3000);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(-8px)';
+    toast.style.transition = 'all 0.25s ease-out';
+    setTimeout(() => toast.remove(), 250);
+  }, 3200);
 }
 
 export function statusBadge(status, color = 'green') {
