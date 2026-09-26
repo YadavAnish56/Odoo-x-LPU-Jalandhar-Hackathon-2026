@@ -1,9 +1,12 @@
-// Simple hash-based SPA router
-const routes = {};
+// Simple hash-based SPA router with parameters, e.g. route('product-detail-:id', handler)
+const routes = [];
 let currentCleanup = null;
+let started = false;
+let guard = () => true;
 
-export function route(path, handler) {
-  routes[path] = handler;
+export function route(path, handler, { nav = path } = {}) {
+  const pattern = new RegExp(`^${path.replace(/:(\w+)/g, '(?<$1>[^/?]+)')}$`);
+  routes.push({ pattern, handler, nav });
 }
 
 export function navigate(path) {
@@ -14,55 +17,68 @@ export function getCurrentPath() {
   return window.location.hash.slice(1) || 'dashboard';
 }
 
-export function startRouter() {
-  async function handleRoute() {
-    const path = getCurrentPath();
-    const app = document.getElementById('app-content');
-    if (!app) return;
+/** Pages are only rendered while the guard returns true (i.e. the user is logged in). */
+export function setRouteGuard(fn) {
+  guard = fn;
+}
 
-    // Run cleanup from previous page
-    if (currentCleanup && typeof currentCleanup === 'function') {
-      currentCleanup();
-      currentCleanup = null;
-    }
+function setActiveNav(navKey) {
+  document.querySelectorAll('[data-nav-path]').forEach((el) => {
+    const active = el.dataset.navPath === navKey;
+    el.classList.toggle('bg-primary-container', active);
+    el.classList.toggle('text-on-primary-container', active);
+    el.classList.toggle('font-semibold', active);
+    el.classList.toggle('text-on-surface-variant', !active);
+    el.classList.toggle('hover:text-on-surface', !active);
+    el.classList.toggle('hover:bg-surface-container-high', !active);
+  });
+  document.querySelectorAll('[data-mobile-nav-path]').forEach((el) => {
+    const active = el.dataset.mobileNavPath === navKey;
+    el.classList.toggle('text-primary-container', active);
+    el.classList.toggle('text-secondary', !active);
+  });
+}
 
-    // Update nav active states
-    document.querySelectorAll('[data-nav-path]').forEach(el => {
-      if (el.dataset.navPath === path) {
-        el.classList.add('bg-primary-container', 'text-on-primary-container', 'font-semibold');
-        el.classList.remove('text-on-surface-variant', 'hover:text-on-surface', 'hover:bg-surface-container-high');
-      } else {
-        el.classList.remove('bg-primary-container', 'text-on-primary-container', 'font-semibold');
-        el.classList.add('text-on-surface-variant', 'hover:text-on-surface', 'hover:bg-surface-container-high');
-      }
-    });
+async function handleRoute() {
+  if (!guard()) return;
+  const app = document.getElementById('app-content');
+  if (!app) return;
 
-    // Update mobile nav
-    document.querySelectorAll('[data-mobile-nav-path]').forEach(el => {
-      if (el.dataset.mobileNavPath === path) {
-        el.classList.add('text-primary-container');
-        el.classList.remove('text-secondary');
-      } else {
-        el.classList.remove('text-primary-container');
-        el.classList.add('text-secondary');
-      }
-    });
-
-    const handler = routes[path];
-    if (handler) {
-      const result = await handler(app);
-      if (typeof result === 'function') {
-        currentCleanup = result;
-      }
-    } else {
-      // Fallback to dashboard
-      navigate('dashboard');
-    }
-
-    // Scroll to top
-    window.scrollTo(0, 0);
+  const path = getCurrentPath();
+  const match = routes.map((r) => ({ r, m: r.pattern.exec(path) })).find((x) => x.m);
+  if (!match) {
+    navigate('dashboard');
+    return;
   }
 
-  window.addEventListener('hashchange', handleRoute);
+  if (typeof currentCleanup === 'function') currentCleanup();
+  currentCleanup = null;
+  setActiveNav(match.r.nav);
+
+  // Each page renders into its own element, so a slow request from a page
+  // the user already left cannot overwrite the new page.
+  const page = document.createElement('div');
+  page.className = 'flex flex-col w-full';
+  app.replaceChildren(page);
+  window.scrollTo(0, 0);
+
+  try {
+    const cleanup = await match.r.handler(page, match.m.groups || {});
+    if (typeof cleanup === 'function') {
+      if (page.isConnected) currentCleanup = cleanup;
+      else cleanup();
+    }
+  } catch (err) {
+    console.error(err);
+    page.innerHTML = `<div class="p-12 text-center text-secondary">Something went wrong while opening this page.</div>`;
+  }
+}
+
+/** Starts listening to URL changes (only once) and renders the current page. */
+export function startRouter() {
+  if (!started) {
+    window.addEventListener('hashchange', handleRoute);
+    started = true;
+  }
   handleRoute();
 }

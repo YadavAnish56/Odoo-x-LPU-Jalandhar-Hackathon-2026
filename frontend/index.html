@@ -4,6 +4,7 @@
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <title>StockSense — Inventory Management System</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
   <meta name="description" content="StockSense: Know your stock. Control every movement. A premium inventory management system for warehouse operations, stock tracking, and logistics."/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet"/>
@@ -30,17 +31,22 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Toast */
-    .toast {
+    /* Toasts stack in the bottom-right corner */
+    #toast-container {
       position: fixed; bottom: 2rem; right: 2rem; z-index: 100;
+      display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem;
+      max-width: min(420px, calc(100vw - 2rem)); pointer-events: none;
+    }
+    .toast {
       padding: 0.75rem 1.25rem; border-radius: 0.75rem;
       font-size: 13px; font-weight: 500; color: white;
       box-shadow: 0 8px 24px rgba(0,0,0,0.12);
       animation: slideUp 0.3s ease-out, fadeOut 0.3s ease-in 2.5s forwards;
     }
     .toast-success { background: #16a34a; }
-    .toast-error { background: #ef4444; }
+    .toast-error { background: #ef4444; animation: slideUp 0.3s ease-out, fadeOut 0.3s ease-in 4.5s forwards; }
     .toast-info { background: #3b82f6; }
+    @media (max-width: 1023px) { #toast-container { bottom: 5.5rem; right: 1rem; } }
     @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     @keyframes fadeOut { to { opacity: 0; transform: translateY(-10px); } }
 
@@ -119,13 +125,25 @@
             <span>Search catalog</span>
             <kbd class="px-1.5 py-0.5 bg-surface-container-lowest text-on-surface-variant rounded text-label-sm font-label-sm shadow-[0_1px_2px_rgba(0,0,0,0.05)]">⌘K</kbd>
           </button>
-          <button aria-label="Notifications" class="relative p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded-full transition-colors flex items-center justify-center" type="button">
+          <button id="notif-btn" aria-label="Low stock alerts" title="Low stock alerts" class="relative p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded-full transition-colors flex items-center justify-center" type="button">
             <span class="material-symbols-outlined">notifications</span>
-            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-primary-container rounded-full"></span>
+            <span id="notif-dot" class="hidden absolute top-1 right-1 min-w-[16px] h-4 px-1 bg-primary-container text-on-primary rounded-full text-[10px] leading-4 font-semibold text-center"></span>
           </button>
-          <div class="relative flex items-center pl-1 cursor-pointer" onclick="window.location.hash='#profile'">
-            <div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary font-label-md text-label-md font-semibold">RS</div>
-            <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full shadow-[0_0_0_2px_#ffffff]"></span>
+          <div class="relative">
+            <button id="user-menu-btn" type="button" class="relative flex items-center pl-1 cursor-pointer" aria-label="Account menu">
+              <div id="user-avatar" class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary font-label-md text-label-md font-semibold"></div>
+              <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full shadow-[0_0_0_2px_#ffffff]"></span>
+            </button>
+            <div id="user-menu" class="hidden absolute right-0 top-11 w-60 bg-surface-container-lowest rounded-xl shadow-xl p-1.5 z-50">
+              <div class="px-3 py-2 border-b border-surface-container mb-1">
+                <div id="user-menu-name" class="font-body-md text-body-md text-on-surface font-semibold truncate"></div>
+                <div id="user-menu-email" class="font-label-sm text-label-sm text-secondary truncate"></div>
+                <div id="user-menu-role" class="font-label-sm text-label-sm text-primary font-semibold mt-0.5"></div>
+              </div>
+              <a href="#profile" class="flex items-center gap-2 px-3 py-2 rounded-lg font-body-sm text-body-sm text-on-surface hover:bg-surface-container-low"><span class="material-symbols-outlined text-[18px] text-secondary">person</span>My Profile</a>
+              <a href="#settings" class="flex items-center gap-2 px-3 py-2 rounded-lg font-body-sm text-body-sm text-on-surface hover:bg-surface-container-low"><span class="material-symbols-outlined text-[18px] text-secondary">settings</span>Settings</a>
+              <button id="logout-btn" type="button" class="w-full flex items-center gap-2 px-3 py-2 rounded-lg font-body-sm text-body-sm text-error hover:bg-error-container/40 text-left"><span class="material-symbols-outlined text-[18px]">logout</span>Sign Out</button>
+            </div>
           </div>
         </div>
       </div>
@@ -145,10 +163,10 @@
           <span class="font-body-sm text-body-sm text-on-surface-variant">Know your stock. Control every movement.</span>
         </div>
         <div class="flex items-center gap-space-xs px-space-md py-1 bg-surface-container-low rounded-full">
-          <span class="w-2 h-2 rounded-full bg-green-500"></span>
-          <span class="font-label-sm text-label-sm text-on-surface font-medium">All systems operational</span>
+          <span id="api-status-dot" class="w-2 h-2 rounded-full bg-secondary"></span>
+          <span id="api-status" class="font-label-sm text-label-sm text-on-surface font-medium">Checking server...</span>
         </div>
-        <div class="font-label-sm text-label-sm text-on-surface-variant">© 2025 StockSense Logistics Inc.</div>
+        <div class="font-label-sm text-label-sm text-on-surface-variant">© 2026 StockSense · Odoo x LPU Hackathon</div>
       </div>
     </footer>
 
