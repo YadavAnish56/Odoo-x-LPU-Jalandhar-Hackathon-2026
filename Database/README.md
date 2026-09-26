@@ -104,5 +104,4 @@ Configure the backend database connection in `backend/.env`:
 ```env
 DATABASE_URL=postgres://postgres:postgres@localhost:5432/stocksense
 ```
-
 The backend uses `pg.Pool` with connection pooling and handles transactional updates for operations and inventory validation.
