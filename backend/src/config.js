@@ -1,0 +1,48 @@
+import dotenv from 'dotenv';
+
+dotenv.config({ quiet: true });
+
+const env = process.env.NODE_ENV || 'development';
+
+function required(name, devDefault) {
+  const value = process.env[name];
+  if (value) return value;
+  if (env === 'production') {
+    throw new Error(`Missing required environment variable: ${name}`);
+  }
+  return devDefault;
+}
+
+const smtpHost = process.env.SMTP_HOST || '';
+
+export const config = {
+  env,
+  isProduction: env === 'production',
+  port: Number(process.env.PORT) || 5000,
+  databaseUrl: required('DATABASE_URL', 'postgres://postgres:postgres@localhost:5432/stocksense'),
+  jwtSecret: required('JWT_SECRET', 'dev-only-secret-change-me'),
+  jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
+  // Comma separated list of allowed origins, or * for any origin.
+  corsOrigin:
+    !process.env.CORS_ORIGIN || process.env.CORS_ORIGIN === '*'
+      ? '*'
+      : process.env.CORS_ORIGIN.split(',').map((o) => o.trim()),
+  otp: {
+    expiryMinutes: Number(process.env.OTP_EXPIRY_MINUTES) || 10,
+    maxAttempts: 5,
+    resendCooldownSeconds: 60,
+  },
+  smtp: {
+    enabled: Boolean(smtpHost),
+    host: smtpHost,
+    port: Number(process.env.SMTP_PORT) || 587,
+    secure: process.env.SMTP_SECURE === 'true',
+    user: process.env.SMTP_USER || '',
+    pass: process.env.SMTP_PASS || '',
+    from: process.env.MAIL_FROM || 'StockSense <no-reply@stocksense.local>',
+  },
+};
+
+// Without SMTP in development, the OTP is printed to the console and returned
+// in the API response so the frontend can be tested end to end.
+config.exposeDevOtp = !config.isProduction && !config.smtp.enabled;
