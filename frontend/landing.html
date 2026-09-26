@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>StockSense — The Operating System for Modern Physical Inventory</title>
+  <meta name="description" content="Real-time multi-warehouse sync, immutable stock ledgers, and automated replenishment. Built for hyper-growth brands and distributed supply chains."/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "on-surface-variant": "#584237",
+            "on-primary-container": "#582200",
+            "tertiary-fixed-dim": "#d1c4bc",
+            "secondary-container": "#e2dfde",
+            "error-container": "#ffdad6",
+            "on-secondary-fixed": "#1c1b1b",
+            "on-error": "#ffffff",
+            "on-primary": "#ffffff",
+            "on-tertiary": "#ffffff",
+            "on-error-container": "#93000a",
+            "surface-container": "#efeded",
+            "on-primary-fixed": "#341100",
+            "secondary-fixed": "#e5e2e1",
+            "surface-bright": "#fbf9f9",
+            "inverse-on-surface": "#f2f0f0",
+            "on-secondary-container": "#636262",
+            "outline": "#8c7164",
+            "on-background": "#1b1c1c",
+            "surface-variant": "#e3e2e2",
+            "surface-tint": "#9d4300",
+            "secondary": "#5f5e5e",
+            "inverse-surface": "#303031",
+            "primary-container": "#f97316",
+            "on-primary-fixed-variant": "#783200",
+            "inverse-primary": "#ffb690",
+            "primary-fixed": "#ffdbca",
+            "surface-container-high": "#e9e8e7",
+            "primary": "#9d4300",
+            "tertiary-fixed": "#ede0d7",
+            "on-tertiary-fixed": "#211a15",
+            "surface": "#fbf9f9",
+            "on-tertiary-container": "#38312b",
+            "surface-container-lowest": "#ffffff",
+            "background": "#fbf9f9",
+            "tertiary-container": "#a49890",
+            "tertiary": "#665d56",
+            "on-secondary": "#ffffff",
+            "error": "#ba1a1a",
+            "on-secondary-fixed-variant": "#474746",
+            "surface-container-highest": "#e3e2e2",
+            "on-tertiary-fixed-variant": "#4e453f",
+            "surface-dim": "#dbdad9",
+            "on-surface": "#1b1c1c",
+            "secondary-fixed-dim": "#c8c6c5",
+            "surface-container-low": "#f5f3f3",
+            "primary-fixed-dim": "#ffb690",
+            "outline-variant": "#e0c0b1"
+          },
+          borderRadius: {
+            DEFAULT: "0.25rem",
+            lg: "0.5rem",
+            xl: "0.75rem",
+            full: "9999px"
+          },
+          spacing: {
+            "space-sm": "0.5rem",
+            "gutter": "1.5rem",
+            "margin": "2.5rem",
+            "space-lg": "1.5rem",
+            "space-xl": "2.5rem",
+            "gutter-mobile": "1rem",
+            "margin-mobile": "1.25rem",
+            "space-xs": "0.25rem",
+            "space-md": "1rem"
+          },
+          fontFamily: {
+            "label-sm": ["Geist", "sans-serif"],
+            "metric-val": ["Geist", "sans-serif"],
+            "body-md": ["Geist", "sans-serif"],
+            "display-mobile": ["Geist", "sans-serif"],
+            "headline-md": ["Geist", "sans-serif"],
+            "body-lg": ["Geist", "sans-serif"],
+            "headline-lg": ["Geist", "sans-serif"],
+            "display": ["Geist", "sans-serif"],
+            "headline-lg-mobile": ["Geist", "sans-serif"],
+            "headline-sm": ["Geist", "sans-serif"],
+            "label-md": ["Geist", "sans-serif"],
+            "body-sm": ["Geist", "sans-serif"]
+          },
+          fontSize: {
+            "label-sm": ["11px", { lineHeight: "14px", letterSpacing: "0.03em", fontWeight: "500" }],
+            "metric-val": ["36px", { lineHeight: "40px", letterSpacing: "-0.03em", fontWeight: "600" }],
+            "body-md": ["14px", { lineHeight: "20px", letterSpacing: "-0.005em", fontWeight: "400" }],
+            "display-mobile": ["32px", { lineHeight: "38px", letterSpacing: "-0.025em", fontWeight: "600" }],
+            "headline-md": ["22px", { lineHeight: "28px", letterSpacing: "-0.02em", fontWeight: "600" }],
+            "body-lg": ["16px", { lineHeight: "24px", letterSpacing: "-0.01em", fontWeight: "400" }],
+            "headline-lg": ["32px", { lineHeight: "38px", letterSpacing: "-0.025em", fontWeight: "600" }],
+            "display": ["48px", { lineHeight: "52px", letterSpacing: "-0.03em", fontWeight: "600" }],
+            "headline-lg-mobile": ["24px", { lineHeight: "30px", letterSpacing: "-0.02em", fontWeight: "600" }],
+            "headline-sm": ["18px", { lineHeight: "24px", letterSpacing: "-0.015em", fontWeight: "500" }],
+            "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.02em", fontWeight: "500" }],
+            "body-sm": ["13px", { lineHeight: "18px", letterSpacing: "0em", fontWeight: "400" }]
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #d4d4d4; border-radius: 8px; }
+    ::-webkit-scrollbar-thumb:hover { background: #a3a3a3; }
+
+    .glow-orange {
+      background: radial-gradient(circle, rgba(249, 115, 22, 0.15) 0%, rgba(249, 115, 22, 0) 70%);
+    }
+
+    /* Toast animation */
+    .toast-popup {
+      animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1), toastOut 0.3s cubic-bezier(0.7, 0, 0.84, 0) 3s forwards;
+    }
+    @keyframes toastIn { from { transform: translateY(20px) scale(0.95); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+    @keyframes toastOut { to { transform: translateY(-10px) scale(0.95); opacity: 0; } }
+
+    /* Float animations */
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+    .animate-float-slow {
+      animation: floatSlow 5s ease-in-out infinite;
+    }
+    .animate-float-delayed {
+      animation: floatSlow 5s ease-in-out infinite 2.5s;
+    }
+  </style>
+</head>
+<body class="bg-surface font-body-md text-on-surface antialiased selection:bg-primary-container selection:text-white">
+
+  <!-- TOP HEADER -->
+  <header class="fixed top-0 inset-x-0 z-50 bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] transition-all">
+    <div class="h-20 max-w-7xl mx-auto px-gutter flex items-center justify-between gap-space-lg">
+      <div class="flex items-center gap-space-xl">
+        <a href="#" class="flex items-center gap-space-sm group">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="34" height="34" fill="none" class="group-hover:scale-105 transition-transform">
+            <rect width="48" height="48" rx="14" fill="#FFF1E8"/>
+            <rect x="12" y="12" width="10" height="10" rx="3.5" fill="#F97316"/>
+            <rect x="26" y="12" width="10" height="10" rx="3.5" fill="#F97316" fill-opacity="0.35"/>
+            <rect x="12" y="26" width="10" height="10" rx="3.5" fill="#F97316" fill-opacity="0.7"/>
+            <path d="M26 31C26 28.2386 28.2386 26 31 26H36V31C36 33.7614 33.7614 36 31 36C28.2386 36 26 33.7614 26 31Z" fill="#F97316"/>
+            <path d="M29 31L33 31M33 31L31 29M33 31L31 33" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="font-headline-sm text-headline-sm tracking-tight text-on-surface font-semibold">StockSense</span>
+        </a>
+        <nav class="hidden lg:flex items-center gap-space-lg">
+          <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" href="#product">Product</a>
+          <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" href="#features">Features</a>
+          <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" href="#solutions">Solutions</a>
+          <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" href="#customers">Customers</a>
+          <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" href="#pricing">Pricing</a>
+        </nav>
+      </div>
+
+      <div class="flex items-center gap-space-md">
+        <a href="/index.html#auth" class="hidden sm:inline-flex items-center justify-center px-space-md py-space-sm rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors">
+          Log in
+        </a>
+        <a href="/index.html#dashboard" class="inline-flex items-center gap-1.5 justify-center px-space-lg py-2.5 rounded-xl font-label-md text-label-md bg-primary-container text-on-primary hover:bg-primary transition-all shadow-[0_2px_8px_rgba(249,115,22,0.25)] hover:shadow-lg active:scale-[0.98]">
+          <span>Launch App</span>
+          <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+        </a>
+        <div class="hidden sm:flex w-9 h-9 rounded-full bg-surface-container-high items-center justify-center text-on-surface cursor-pointer hover:bg-surface-container-highest transition-colors" onclick="window.location.href='/index.html#profile'">
+          <span class="material-symbols-outlined text-[20px] text-primary">person</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN WRAPPER -->
+  <main class="w-full pt-20 bg-surface">
+    <div class="flex flex-col w-full">
+
+      <!-- Ambient Glow Accents -->
+      <div class="relative w-full overflow-hidden">
+        <div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[900px] h-[480px] bg-gradient-to-b from-primary-fixed/40 via-primary-fixed/15 to-transparent blur-3xl pointer-events-none -z-10 rounded-full"></div>
+        <div class="absolute top-96 -right-48 w-[400px] h-[400px] bg-primary-fixed/20 blur-3xl pointer-events-none -z-10 rounded-full"></div>
+
+        <!-- 1. HERO SECTION -->
+        <section id="product" class="w-full px-gutter pt-space-xl pb-24">
+          <div class="max-w-6xl mx-auto flex flex-col items-center text-center">
+            
+            <!-- Eyebrow Pill -->
+            <div class="inline-flex items-center gap-space-sm px-4 py-1.5 rounded-full bg-surface-container shadow-sm mb-space-lg group cursor-pointer transition-all hover:bg-surface-container-high" onclick="document.getElementById('features').scrollIntoView({ behavior: 'smooth' });">
+              <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+              <span class="font-label-sm text-label-sm text-on-surface-variant font-medium">Next-Gen Inventory Logistics</span>
+              <span class="text-secondary opacity-40 text-xs">/</span>
+              <span class="font-label-sm text-label-sm text-primary font-semibold flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform">
+                Explore StockSense 2.0
+                <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+              </span>
+            </div>
+
+            <!-- Headline -->
+            <h1 class="font-display text-display text-4xl sm:text-5xl lg:text-[54px] max-w-4xl text-on-surface tracking-tight mb-space-md leading-[1.12]">
+              The operating system for modern physical inventory.
+            </h1>
+
+            <!-- Subhead -->
+            <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mb-space-xl text-base sm:text-lg">
+              Real-time multi-warehouse sync, immutable stock ledgers, and automated replenishment. Built for hyper-growth brands and distributed supply chains.
+            </p>
+
+            <!-- CTA Cluster -->
+            <div class="flex flex-wrap items-center justify-center gap-space-md mb-space-lg">
+              <a href="/index.html#dashboard" class="inline-flex items-center gap-space-sm px-7 py-3.5 rounded-xl font-label-md text-label-md bg-primary-container text-on-primary font-semibold hover:bg-primary transition-all shadow-[0_4px_16px_rgba(249,115,22,0.3)] hover:shadow-xl active:scale-[0.99]">
+                <span>Start 14-day Free Trial</span>
+                <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+              </a>
+              <button onclick="openDemoModal()" class="inline-flex items-center gap-space-sm px-6 py-3.5 rounded-xl font-label-md text-label-md bg-surface-container-lowest text-on-surface font-medium hover:bg-surface-container-low transition-all shadow-sm border border-surface-container-high/60 cursor-pointer">
+                <span class="material-symbols-outlined text-[18px] text-primary">play_circle</span>
+                <span>Schedule Live Demo</span>
+              </button>
+            </div>
+
+            <!-- Social Proof Micro-copy -->
+            <div class="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 font-label-sm text-label-sm text-secondary mb-space-xl">
+              <span class="flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-primary text-[15px]">credit_card_off</span>
+                No credit card required
+              </span>
+              <span class="w-1 h-1 rounded-full bg-secondary-container"></span>
+              <span class="flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-primary text-[15px]">verified_user</span>
+                SOC2 Type II Certified
+              </span>
+              <span class="w-1 h-1 rounded-full bg-secondary-container"></span>
+              <span class="flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-primary text-[15px]">bolt</span>
+                99.99% ledger uptime
+              </span>
+            </div>
+
+            <!-- HERO MOCKUP & FLOATING CARDS WRAPPER -->
+            <div class="relative w-full max-w-5xl mt-4">
+              <!-- Main Window Frame -->
+              <div class="w-full bg-surface-container-lowest rounded-3xl p-5 sm:p-7 shadow-[0_20px_60px_rgba(0,0,0,0.08)] border border-surface-container-high/40">
+                
+                <!-- Window Topbar -->
+                <div class="flex items-center justify-between pb-4 mb-6 border-b border-surface-container-high/60">
+                  <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-rose-400"></span>
+                    <span class="w-3 h-3 rounded-full bg-amber-400"></span>
+                    <span class="w-3 h-3 rounded-full bg-emerald-400"></span>
+                    <span class="ml-3 font-label-sm text-label-sm text-secondary bg-surface-container px-3 py-1 rounded-full flex items-center gap-1.5">
+                      <span class="w-1.5 h-1.5 rounded-full bg-primary-container animate-pulse"></span>
+                      stocksense.internal/hub/chicago-central
+                    </span>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <span class="font-label-sm text-label-sm text-secondary">Telemetry Sync: <strong class="text-on-surface" id="live-ping">14ms</strong></span>
+                    <span class="px-2.5 py-1 rounded-md bg-surface-container font-label-sm text-label-sm text-on-surface-variant font-mono">v2.4.9</span>
+                  </div>
+                </div>
+
+                <!-- Dashboard Content Layout Inside Window -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg text-left">
+                  <!-- Left Mini Nav/Ledger Stream -->
+                  <div class="lg:col-span-4 bg-surface-container-low rounded-2xl p-space-md flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-center justify-between mb-space-md">
+                        <span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary">Active Facility</span>
+                        <span class="px-2 py-0.5 rounded-full bg-surface-container font-label-sm text-label-sm text-primary font-medium">Main Bay 04</span>
+                      </div>
+                      <h3 class="font-headline-sm text-headline-sm text-on-surface mb-1">Chicago Gateway DC</h3>
+                      <p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md">Autonomous sorting & corridor transfer active.</p>
+                      
+                      <!-- Live Mini Log -->
+                      <div class="space-y-2 mb-space-md" id="telemetry-log">
+                        <div class="p-2.5 rounded-xl bg-surface-container-lowest shadow-sm flex items-center justify-between transition-all hover:bg-surface-container-low">
+                          <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-primary-container"></span>
+                            <span class="font-label-sm text-label-sm text-on-surface font-medium">Scan: Pallet #9822</span>
+                          </div>
+                          <span class="font-mono text-label-sm text-secondary">Just now</span>
+                        </div>
+                        <div class="p-2.5 rounded-xl bg-surface-container-lowest shadow-sm flex items-center justify-between transition-all hover:bg-surface-container-low">
+                          <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-secondary"></span>
+                            <span class="font-label-sm text-label-sm text-on-surface font-medium">Rack Re-weight: R-12</span>
+                          </div>
+                          <span class="font-mono text-label-sm text-secondary">2m ago</span>
+                        </div>
+                        <div class="p-2.5 rounded-xl bg-surface-container-lowest shadow-sm flex items-center justify-between transition-all hover:bg-surface-container-low">
+                          <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            <span class="font-label-sm text-label-sm text-on-surface font-medium">Inbound Receipt #890</span>
+                          </div>
+                          <span class="font-mono text-label-sm text-secondary">5m ago</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="pt-3 border-t border-surface-container-high/60 flex items-center justify-between">
+                      <span class="font-label-sm text-label-sm text-secondary">Hub Telemetry</span>
+                      <span class="font-label-sm text-label-sm font-semibold text-emerald-600 flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        4 Hubs Synced
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Central Hero Metric & SKU Card -->
+                  <div class="lg:col-span-8 bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm border border-surface-container-high/40 flex flex-col justify-between">
+                    <div class="flex flex-wrap items-start justify-between gap-space-sm mb-space-md">
+                      <div>
+                        <div class="flex items-center gap-2 mb-1">
+                          <span class="font-label-sm text-label-sm text-secondary font-mono tracking-wide">SKU: STL-001</span>
+                          <span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm font-medium">Critical Raw Material</span>
+                        </div>
+                        <h2 class="font-headline-md text-headline-md text-on-surface font-semibold">Cold-Rolled Steel Rod (20mm)</h2>
+                      </div>
+                      <div class="text-right">
+                        <span class="font-metric-val text-metric-val text-on-surface font-bold">500 <span class="font-headline-sm text-headline-sm text-secondary font-normal">kg</span></span>
+                        <span class="block font-label-sm text-label-sm text-secondary">Live on-hand balance</span>
+                      </div>
+                    </div>
+
+                    <!-- Safe Threshold Gauge Bar -->
+                    <div class="mb-space-lg">
+                      <div class="flex items-center justify-between text-body-sm font-body-sm text-secondary mb-2">
+                        <span class="flex items-center gap-1.5 text-on-surface font-medium">
+                          <span class="material-symbols-outlined text-primary text-[16px]">verified</span>
+                          Optimal Operating Threshold
+                        </span>
+                        <span class="font-mono text-primary font-semibold">500 / 600 kg (83.3%)</span>
+                      </div>
+                      <div class="w-full h-3 bg-surface-container-high rounded-full overflow-hidden p-0.5">
+                        <div class="h-full bg-primary-container rounded-full transition-all duration-700 shadow-sm" style="width: 83.3%;"></div>
+                      </div>
+                      <div class="flex justify-between font-label-sm text-label-sm text-secondary mt-1.5 font-mono">
+                        <span>Reorder Min: 120 kg</span>
+                        <span>Safety Buffer: 250 kg</span>
+                        <span>Max Capacity: 600 kg</span>
+                      </div>
+                    </div>
+
+                    <!-- Trendline & Meta Ribbon -->
+                    <div class="bg-surface-container-low rounded-xl p-space-md flex flex-wrap items-center justify-between gap-space-md">
+                      <div class="flex items-center gap-space-md">
+                        <div class="w-10 h-10 rounded-lg bg-surface-container-lowest flex items-center justify-center text-primary shadow-sm">
+                          <span class="material-symbols-outlined text-[20px]">moving</span>
+                        </div>
+                        <div>
+                          <span class="font-label-sm text-label-sm text-secondary uppercase tracking-wider block">7-Day Velocity</span>
+                          <span class="font-body-md text-body-md text-on-surface font-semibold">+18.4% consumption demand</span>
+                        </div>
+                      </div>
+                      <!-- Mini SVG Sparkline -->
+                      <div class="flex items-center gap-3">
+                        <svg class="w-28 h-8 text-primary overflow-visible" fill="none" viewBox="0 0 100 30">
+                          <path d="M0 24 L18 20 L35 22 L55 12 L72 16 L100 4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+                          <circle class="fill-primary" cx="100" cy="4" r="3.5"></circle>
+                        </svg>
+                        <span class="font-label-sm text-label-sm bg-primary/10 text-primary px-2.5 py-1 rounded font-semibold">Stable</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- FLOATING CONTEXTUAL OVERLAY MICRO-CARDS -->
+              <!-- Top Right Float: Low Stock Alert -->
+              <div class="hidden sm:flex absolute -top-8 -right-6 lg:-right-10 bg-surface-container-lowest p-space-md rounded-2xl shadow-xl border border-surface-container-high/60 max-w-xs items-start gap-space-sm text-left animate-float-slow">
+                <div class="w-8 h-8 rounded-xl bg-primary-fixed flex items-center justify-center shrink-0">
+                  <span class="material-symbols-outlined text-primary text-[18px]">warning</span>
+                </div>
+                <div class="min-w-0">
+                  <div class="flex items-center gap-1.5 mb-0.5">
+                    <span class="font-label-sm text-label-sm text-primary font-bold tracking-tight">Low Stock Alert</span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+                  </div>
+                  <p class="font-body-sm text-body-sm text-on-surface font-medium truncate">Aluminum Alloy 6061</p>
+                  <p class="font-label-sm text-label-sm text-secondary">15 kg left • Auto-drafted PO #889</p>
+                </div>
+              </div>
+
+              <!-- Bottom Left Float: Inbound Verified -->
+              <div class="hidden sm:flex absolute -bottom-6 -left-6 lg:-left-10 bg-surface-container-lowest p-space-md rounded-2xl shadow-xl border border-surface-container-high/60 max-w-sm items-center gap-space-md text-left animate-float-delayed">
+                <div class="w-9 h-9 rounded-xl bg-surface-container-high flex items-center justify-center shrink-0 text-on-surface">
+                  <span class="material-symbols-outlined text-[20px] text-primary">add_task</span>
+                </div>
+                <div>
+                  <span class="font-label-sm text-label-sm font-semibold text-on-surface block">+100 kg Inbound Verified</span>
+                  <span class="font-label-sm text-label-sm text-secondary">Arrived at Main Warehouse Bay 04 • Ledger hash signed</span>
+                </div>
+              </div>
+
+              <!-- Floating Transfer Pill Bottom Right -->
+              <div class="hidden md:flex absolute -bottom-8 right-16 bg-surface-container-lowest px-4 py-2.5 rounded-full shadow-lg border border-surface-container-high/60 items-center gap-2 text-left">
+                <span class="w-2 h-2 rounded-full bg-primary-container animate-pulse"></span>
+                <span class="font-label-sm text-label-sm text-on-surface font-medium">→ 40 kg Transferred to Production Rack</span>
+                <span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-surface-container text-secondary">In Transit</span>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- 2. TRUSTED BY / SOCIAL PROOF RIBBON -->
+        <section class="w-full px-gutter py-space-xl bg-surface-container-lowest border-y border-surface-container-high/40">
+          <div class="max-w-6xl mx-auto flex flex-col items-center">
+            <p class="font-label-sm text-label-sm uppercase tracking-wider text-secondary text-center mb-space-lg">
+              Powering inventory intelligence for 2,400+ modern manufacturing and distribution leaders
+            </p>
+            <div class="w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-space-lg items-center justify-items-center opacity-75">
+              <div class="flex items-center gap-2 group hover:opacity-100 hover:text-primary transition-all cursor-default">
+                <span class="material-symbols-outlined text-[24px]">precision_manufacturing</span>
+                <span class="font-headline-sm text-headline-sm font-semibold tracking-tight">VERTEX</span>
+              </div>
+              <div class="flex items-center gap-2 group hover:opacity-100 hover:text-primary transition-all cursor-default">
+                <span class="material-symbols-outlined text-[24px]">flight_takeoff</span>
+                <span class="font-headline-sm text-headline-sm font-semibold tracking-tight">AETHER</span>
+              </div>
+              <div class="flex items-center gap-2 group hover:opacity-100 hover:text-primary transition-all cursor-default">
+                <span class="material-symbols-outlined text-[24px]">account_tree</span>
+                <span class="font-headline-sm text-headline-sm font-semibold tracking-tight">FOUNDRY</span>
+              </div>
+              <div class="flex items-center gap-2 group hover:opacity-100 hover:text-primary transition-all cursor-default">
+                <span class="material-symbols-outlined text-[24px]">local_shipping</span>
+                <span class="font-headline-sm text-headline-sm font-semibold tracking-tight">HELIX</span>
+              </div>
+              <div class="flex items-center gap-2 group hover:opacity-100 hover:text-primary transition-all cursor-default">
+                <span class="material-symbols-outlined text-[24px]">layers</span>
+                <span class="font-headline-sm text-headline-sm font-semibold tracking-tight">NORTHWIND</span>
+              </div>
+              <div class="flex items-center gap-2 group hover:opacity-100 hover:text-primary transition-all cursor-default">
+                <span class="material-symbols-outlined text-[24px]">science</span>
+                <span class="font-headline-sm text-headline-sm font-semibold tracking-tight">KROMA</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. INTERACTIVE VALUE PROPS / CORE CAPABILITIES -->
+        <section id="features" class="w-full px-gutter py-24 bg-surface">
+          <div class="max-w-6xl mx-auto">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-space-xl gap-space-md">
+              <div>
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container font-label-sm text-label-sm text-primary font-semibold mb-space-sm">
+                  Architecture Built For Real Movement
+                </div>
+                <h2 class="font-headline-lg text-headline-lg text-3xl sm:text-4xl text-on-surface tracking-tight font-semibold">
+                  Designed for speed, scaled for zero audit drift.
+                </h2>
+              </div>
+              <p class="font-body-md text-body-md text-on-surface-variant max-w-md">
+                Eliminate ghost inventory and reconciliation lags. Our tactile operating engine turns physical operations into deterministic ledger state.
+              </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-space-lg">
+              <!-- Card 1: Immutable Stock Ledger -->
+              <div class="bg-surface-container-lowest rounded-3xl p-space-lg shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col justify-between border border-surface-container-high/40">
+                <div>
+                  <div class="w-12 h-12 rounded-2xl bg-surface-container flex items-center justify-center mb-space-lg text-primary">
+                    <span class="material-symbols-outlined text-[24px]">receipt_long</span>
+                  </div>
+                  <h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold mb-space-sm">Immutable Stock Ledger</h3>
+                  <p class="font-body-md text-body-md text-on-surface-variant mb-space-lg">
+                    Every gram, unit, and pallet verified with cryptographic precision. Append-only ledger logs every scan, split, and drop.
+                  </p>
+                </div>
+                <!-- Mini Ledger Block Mockup -->
+                <div class="bg-surface-container-low rounded-2xl p-space-md">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="font-mono text-label-sm text-primary font-semibold">BLOCK #482,901</span>
+                    <span class="inline-flex items-center gap-1 font-label-sm text-label-sm bg-surface-container px-2 py-0.5 rounded-full text-on-surface font-medium">
+                      <span class="material-symbols-outlined text-[12px] text-emerald-600">lock</span>
+                      Signed
+                    </span>
+                  </div>
+                  <div class="font-mono text-label-sm text-secondary truncate mb-1">TX: 0x9f1a...c82d</div>
+                  <div class="flex items-center justify-between text-body-sm font-body-sm text-on-surface">
+                    <span>Verified Net Δ</span>
+                    <span class="font-semibold text-primary">+250 Units STL</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card 2: Live Corridor Transfer Tracking -->
+              <div class="bg-surface-container-lowest rounded-3xl p-space-lg shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col justify-between border border-surface-container-high/40">
+                <div>
+                  <div class="w-12 h-12 rounded-2xl bg-primary-fixed flex items-center justify-center mb-space-lg text-primary">
+                    <span class="material-symbols-outlined text-[24px]">route</span>
+                  </div>
+                  <h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold mb-space-sm">Corridor Transfer Tracking</h3>
+                  <p class="font-body-md text-body-md text-on-surface-variant mb-space-lg">
+                    Real-time telemetry tracking materials moving from receiving bays to high-density racks and automated assembly cells.
+                  </p>
+                </div>
+                <!-- Corridor Step Visualizer -->
+                <div class="bg-surface-container-low rounded-2xl p-space-md space-y-2.5">
+                  <div class="flex items-center justify-between text-label-sm font-label-sm">
+                    <span class="text-secondary font-medium">Route: Central → Rack B-12</span>
+                    <span class="text-primary font-semibold">4 mins remaining</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-primary-container"></span>
+                    <div class="h-1 flex-1 bg-primary-container rounded-full"></div>
+                    <span class="w-3 h-3 rounded-full bg-primary-container animate-pulse"></span>
+                    <div class="h-1 flex-1 bg-surface-container-high rounded-full"></div>
+                    <span class="w-3 h-3 rounded-full bg-surface-container-highest"></span>
+                  </div>
+                  <div class="flex justify-between font-label-sm text-label-sm text-secondary">
+                    <span>Dock 02</span>
+                    <span class="text-on-surface font-medium">Internal Transit</span>
+                    <span>Assembly</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card 3: Automated Replenishment -->
+              <div class="bg-surface-container-lowest rounded-3xl p-space-lg shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col justify-between border border-surface-container-high/40">
+                <div>
+                  <div class="w-12 h-12 rounded-2xl bg-surface-container flex items-center justify-center mb-space-lg text-primary">
+                    <span class="material-symbols-outlined text-[24px]">auto_mode</span>
+                  </div>
+                  <h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold mb-space-sm">Automated Replenishment</h3>
+                  <p class="font-body-md text-body-md text-on-surface-variant mb-space-lg">
+                    Dynamic safety stock levels dynamically compute run-out rates, supplier lead times, and shipping delays before stockouts happen.
+                  </p>
+                </div>
+                <!-- Dynamic Reorder Card -->
+                <div class="bg-surface-container-low rounded-2xl p-space-md">
+                  <div class="flex items-center justify-between mb-1.5">
+                    <span class="font-label-sm text-label-sm text-secondary">Runway Velocity</span>
+                    <span class="font-label-sm text-label-sm font-semibold text-primary">11.4 Days Left</span>
+                  </div>
+                  <div class="flex items-center justify-between pt-2 border-t border-surface-container-high/60">
+                    <span class="font-body-sm text-body-sm text-on-surface font-medium">Smart PO #1084</span>
+                    <span class="px-2.5 py-0.5 rounded-full bg-primary-container text-on-primary font-label-sm text-label-sm font-semibold">Auto-Approved</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. DEEP FEATURE HIGHLIGHT (Bento Grid Style) -->
+        <section id="solutions" class="w-full px-gutter py-20 bg-surface-container-low">
+          <div class="max-w-6xl mx-auto">
+            <div class="max-w-2xl mb-space-xl">
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container-highest font-label-sm text-label-sm text-primary font-semibold mb-space-sm">
+                Core Modules
+              </div>
+              <h2 class="font-headline-lg text-headline-lg text-3xl sm:text-4xl text-on-surface tracking-tight mb-space-sm font-semibold">
+                Total control over every physical node.
+              </h2>
+              <p class="font-body-md text-body-md text-on-surface-variant">
+                Connect regional distribution warehouses, local fulfillment centers, and factory stockrooms in one single pane of glass.
+              </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg">
+              <!-- Left Large Showcase Card: Multi-Warehouse Architecture (7 cols) -->
+              <div class="lg:col-span-7 bg-surface-container-lowest rounded-3xl p-space-lg shadow-sm border border-surface-container-high/40 flex flex-col justify-between">
+                <div>
+                  <div class="flex items-center justify-between mb-space-md">
+                    <span class="px-3 py-1 rounded-full bg-surface-container font-label-sm text-label-sm text-on-surface font-mono">NODE MONITOR</span>
+                    <span class="flex items-center gap-1.5 font-label-sm text-label-sm text-primary font-semibold">
+                      <span class="w-2 h-2 rounded-full bg-primary-container animate-ping"></span>
+                      Active Routing Sync
+                    </span>
+                  </div>
+                  <h3 class="font-headline-md text-headline-md text-on-surface font-semibold mb-2">Unified Multi-Warehouse Architecture</h3>
+                  <p class="font-body-md text-body-md text-on-surface-variant mb-space-lg max-w-xl">
+                    Dynamic load balancing routes incoming stock to optimal facilities based on micro-market demand, carrier capacity, and real-time bay utilization.
+                  </p>
+                </div>
+
+                <!-- Bay & Node Diagram -->
+                <div class="bg-surface-container-low rounded-2xl p-space-md space-y-3">
+                  <!-- Detroit Hub -->
+                  <div class="p-3 bg-surface-container-lowest rounded-xl flex items-center justify-between shadow-xs">
+                    <div class="flex items-center gap-3">
+                      <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface font-semibold font-mono text-label-sm">
+                        DT
+                      </div>
+                      <div>
+                        <h4 class="font-body-md text-body-md font-semibold text-on-surface">Detroit Logistics Hub</h4>
+                        <span class="font-label-sm text-label-sm text-secondary">32 Active Corridors • 14 Forklift Units</span>
+                      </div>
+                    </div>
+                    <div class="text-right">
+                      <span class="font-body-md text-body-md font-bold text-on-surface">86% Cap</span>
+                      <div class="w-20 h-1.5 bg-surface-container rounded-full mt-1 overflow-hidden">
+                        <div class="w-[86%] h-full bg-primary-container"></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- West Coast Depot -->
+                  <div class="p-3 bg-surface-container-lowest rounded-xl flex items-center justify-between shadow-xs">
+                    <div class="flex items-center gap-3">
+                      <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface font-semibold font-mono text-label-sm">
+                        WC
+                      </div>
+                      <div>
+                        <h4 class="font-body-md text-body-md font-semibold text-on-surface">West Coast Depot</h4>
+                        <span class="font-label-sm text-label-sm text-secondary">18 Active Corridors • High Availability</span>
+                      </div>
+                    </div>
+                    <div class="text-right">
+                      <span class="font-body-md text-body-md font-bold text-on-surface">42% Cap</span>
+                      <div class="w-20 h-1.5 bg-surface-container rounded-full mt-1 overflow-hidden">
+                        <div class="w-[42%] h-full bg-primary-container"></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Newark Port Yard -->
+                  <div class="p-3 bg-surface-container-lowest rounded-xl flex items-center justify-between shadow-xs">
+                    <div class="flex items-center gap-3">
+                      <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface font-semibold font-mono text-label-sm">
+                        NW
+                      </div>
+                      <div>
+                        <h4 class="font-body-md text-body-md font-semibold text-on-surface">Newark Maritime Yard</h4>
+                        <span class="font-label-sm text-label-sm text-secondary">Intermodal Inbound • 8 Sea Containers</span>
+                      </div>
+                    </div>
+                    <div class="text-right">
+                      <span class="font-body-md text-body-md font-bold text-on-surface">68% Cap</span>
+                      <div class="w-20 h-1.5 bg-surface-container rounded-full mt-1 overflow-hidden">
+                        <div class="w-[68%] h-full bg-primary-container"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right Bento Stack (5 cols) -->
+              <div class="lg:col-span-5 flex flex-col gap-space-lg">
+                <!-- Top Right: Instant Barcode & Mobile Scan -->
+                <div class="bg-surface-container-lowest rounded-3xl p-space-lg shadow-sm border border-surface-container-high/40 flex flex-col justify-between flex-1">
+                  <div>
+                    <div class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center mb-space-md text-primary">
+                      <span class="material-symbols-outlined text-[20px]">qr_code_scanner</span>
+                    </div>
+                    <h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold mb-1">Instant Optical & Barcode Scan</h3>
+                    <p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md">
+                      Turn iOS/Android devices and industrial zebra scanners into ultra-responsive terminals with 99.8% first-pass accuracy.
+                    </p>
+                  </div>
+                  <div class="p-space-sm bg-surface-container-low rounded-xl flex items-center justify-between">
+                    <span class="font-label-sm text-label-sm text-secondary font-mono">1D / 2D / GS1 Datamatrix</span>
+                    <span class="font-label-sm text-label-sm font-semibold text-primary">0.04s Capture Speed</span>
+                  </div>
+                </div>
+
+                <!-- Bottom Right: Seamless ERP & WMS Integrations -->
+                <div class="bg-surface-container-lowest rounded-3xl p-space-lg shadow-sm border border-surface-container-high/40 flex flex-col justify-between flex-1">
+                  <div>
+                    <div class="w-10 h-10 rounded-xl bg-primary-fixed flex items-center justify-center mb-space-md text-primary">
+                      <span class="material-symbols-outlined text-[20px]">hub</span>
+                    </div>
+                    <h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold mb-1">Seamless ERP & WMS Sync</h3>
+                    <p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md">
+                      Bi-directional webhooks and pre-built native connectors sync orders, receipts, and BOMs automatically with zero data double-entry.
+                    </p>
+                  </div>
+                  <div class="flex flex-wrap gap-2">
+                    <span class="px-2.5 py-1 rounded-lg bg-surface-container font-label-sm text-label-sm text-on-surface font-medium">SAP S/4HANA</span>
+                    <span class="px-2.5 py-1 rounded-lg bg-surface-container font-label-sm text-label-sm text-on-surface font-medium">NetSuite</span>
+                    <span class="px-2.5 py-1 rounded-lg bg-surface-container font-label-sm text-label-sm text-on-surface font-medium">Shopify Plus</span>
+                    <span class="px-2.5 py-1 rounded-lg bg-surface-container font-label-sm text-label-sm text-primary font-mono font-medium">GraphQL API</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 5. METRICS / IMPACT SECTION -->
+        <section class="w-full px-gutter py-24 bg-surface">
+          <div class="max-w-6xl mx-auto">
+            <div class="text-center max-w-2xl mx-auto mb-space-xl">
+              <span class="font-label-sm text-label-sm uppercase tracking-wider text-primary font-semibold block mb-space-xs">Measurable Efficiency</span>
+              <h2 class="font-headline-lg text-headline-lg text-3xl sm:text-4xl text-on-surface tracking-tight font-semibold">
+                Proof in numbers, verified on the warehouse floor.
+              </h2>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-lg">
+              <!-- Metric 1 -->
+              <div class="bg-surface-container-lowest rounded-3xl p-space-lg shadow-sm border border-surface-container-high/40 hover:shadow-md transition-all">
+                <span class="font-metric-val text-metric-val text-primary block mb-1 tracking-tight font-bold">-78%</span>
+                <h3 class="font-body-md text-body-md text-on-surface font-semibold mb-1">Stock Discrepancy & Shrink</h3>
+                <p class="font-body-sm text-body-sm text-secondary">
+                  Virtual and physical balance aligned within minutes of receipt.
+                </p>
+              </div>
+
+              <!-- Metric 2 -->
+              <div class="bg-surface-container-lowest rounded-3xl p-space-lg shadow-sm border border-surface-container-high/40 hover:shadow-md transition-all">
+                <span class="font-metric-val text-metric-val text-on-surface block mb-1 tracking-tight font-bold">3.4x</span>
+                <h3 class="font-body-md text-body-md text-on-surface font-semibold mb-1">Faster Receiving Check-in</h3>
+                <p class="font-body-sm text-body-sm text-secondary">
+                  Automated optical bill-of-lading scans bypass manual clerk entry.
+                </p>
+              </div>
+
+              <!-- Metric 3 -->
+              <div class="bg-surface-container-lowest rounded-3xl p-space-lg shadow-sm border border-surface-container-high/40 hover:shadow-md transition-all">
+                <span class="font-metric-val text-metric-val text-primary block mb-1 tracking-tight font-bold">$1.2M+</span>
+                <h3 class="font-body-md text-body-md text-on-surface font-semibold mb-1">Working Capital Saved</h3>
+                <p class="font-body-sm text-body-sm text-secondary">
+                  Unlocked locked-up cash by eliminating bloated buffer stock.
+                </p>
+              </div>
+
+              <!-- Metric 4 -->
+              <div class="bg-surface-container-lowest rounded-3xl p-space-lg shadow-sm border border-surface-container-high/40 hover:shadow-md transition-all">
+                <span class="font-metric-val text-metric-val text-on-surface block mb-1 tracking-tight font-bold">99.99%</span>
+                <h3 class="font-body-md text-body-md text-on-surface font-semibold mb-1">Inventory Audit Accuracy</h3>
+                <p class="font-body-sm text-body-sm text-secondary">
+                  Strict perpetual cycle counting replaces end-of-year shutdowns.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 6. EDITORIAL TESTIMONIAL STORY -->
+        <section id="customers" class="w-full px-gutter py-20 bg-surface-container-low">
+          <div class="max-w-5xl mx-auto">
+            <div class="bg-surface-container-lowest rounded-3xl p-space-xl md:p-14 shadow-lg shadow-surface-tint/5 border border-surface-container-high/40 relative overflow-hidden">
+              <span class="material-symbols-outlined absolute -top-8 -right-8 text-[180px] text-surface-container-high/30 select-none pointer-events-none">format_quote</span>
+              
+              <div class="relative z-10 flex flex-col md:flex-row gap-space-xl items-start md:items-center justify-between">
+                <div class="max-w-2xl">
+                  <div class="flex items-center gap-1.5 mb-space-md text-primary">
+                    <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                    <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                    <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                    <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                    <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                    <span class="ml-2 font-label-sm text-label-sm font-semibold text-secondary">5.0 Customer Rating</span>
+                  </div>
+
+                  <blockquote class="font-headline-md text-headline-md text-on-surface leading-snug mb-space-lg tracking-tight font-medium text-lg sm:text-xl">
+                    "StockSense replaced our clunky legacy ERP in less than a week. The clarity of live stock transfers across our three manufacturing facilities transformed our delivery speed and cut stockout emergencies to zero."
+                  </blockquote>
+
+                  <div class="flex items-center gap-space-md">
+                    <div class="w-12 h-12 rounded-full bg-primary-container text-white flex items-center justify-center font-bold text-lg shadow-sm">
+                      ER
+                    </div>
+                    <div>
+                      <h4 class="font-body-md text-body-md font-semibold text-on-surface">Elena Rostova</h4>
+                      <p class="font-body-sm text-body-sm text-on-surface-variant">VP of Supply Chain Operations at <strong class="text-on-surface">HyperForge</strong></p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Supporting Stat Callout -->
+                <div class="bg-surface-container-low rounded-2xl p-space-md min-w-[200px] text-left shrink-0 border border-surface-container-high/60">
+                  <span class="font-label-sm text-label-sm text-secondary uppercase tracking-wider block mb-1">Impact at HyperForge</span>
+                  <span class="font-headline-lg text-headline-lg font-bold text-primary block text-3xl">6 Days</span>
+                  <span class="font-body-sm text-body-sm text-on-surface font-medium block">Total ERP Cutover Time</span>
+                  <span class="font-label-sm text-label-sm text-secondary block mt-2 text-emerald-600 font-medium">Zero production stoppage</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 7. PRICING SECTION -->
+        <section id="pricing" class="w-full px-gutter py-24 bg-surface">
+          <div class="max-w-6xl mx-auto">
+            <div class="text-center max-w-2xl mx-auto mb-space-xl">
+              <span class="font-label-sm text-label-sm uppercase tracking-wider text-primary font-semibold block mb-space-xs">Simple Transparent Pricing</span>
+              <h2 class="font-headline-lg text-headline-lg text-3xl sm:text-4xl text-on-surface tracking-tight font-semibold">
+                Predictable plans that scale with your SKUs.
+              </h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-space-lg items-stretch">
+              <!-- Tier 1: Growth -->
+              <div class="bg-surface-container-lowest rounded-3xl p-space-lg shadow-sm border border-surface-container-high/40 flex flex-col justify-between hover:shadow-lg transition-all">
+                <div>
+                  <h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface mb-1">Starter Hub</h3>
+                  <p class="font-body-sm text-body-sm text-secondary mb-4">For single-site distribution & quick turn stockrooms.</p>
+                  <div class="flex items-baseline gap-1 mb-6">
+                    <span class="font-metric-val text-metric-val font-bold text-on-surface">$149</span>
+                    <span class="text-secondary font-body-sm">/ facility / month</span>
+                  </div>
+                  <ul class="space-y-3 font-body-sm text-body-sm text-on-surface-variant">
+                    <li class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[18px]">check_circle</span> Up to 5,000 SKUs</li>
+                    <li class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[18px]">check_circle</span> 1 Physical Warehouse Node</li>
+                    <li class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[18px]">check_circle</span> Mobile Barcode Scanning</li>
+                    <li class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[18px]">check_circle</span> Immutable Move History</li>
+                  </ul>
+                </div>
+                <a href="/index.html#auth" class="mt-8 w-full py-3 rounded-xl bg-surface-container text-on-surface hover:bg-surface-container-high text-center font-label-md text-label-md font-semibold transition-all">
+                  Start Starter Plan
+                </a>
+              </div>
+
+              <!-- Tier 2: Pro (Featured) -->
+              <div class="bg-surface-container-lowest rounded-3xl p-space-lg shadow-xl border-2 border-primary-container flex flex-col justify-between relative hover:shadow-2xl transition-all scale-100 md:-translate-y-2">
+                <span class="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-primary-container text-on-primary font-label-sm text-label-sm font-semibold shadow-sm">
+                  MOST POPULAR
+                </span>
+                <div>
+                  <h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface mb-1">Enterprise Fleet</h3>
+                  <p class="font-body-sm text-body-sm text-secondary mb-4">For multi-facility manufacturing and distributed 3PLs.</p>
+                  <div class="flex items-baseline gap-1 mb-6">
+                    <span class="font-metric-val text-metric-val font-bold text-on-surface">$499</span>
+                    <span class="text-secondary font-body-sm">/ facility / month</span>
+                  </div>
+                  <ul class="space-y-3 font-body-sm text-body-sm text-on-surface-variant">
+                    <li class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[18px]">check_circle</span> Unlimited SKUs & Movements</li>
+                    <li class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[18px]">check_circle</span> Multi-Warehouse Auto Load Balancing</li>
+                    <li class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[18px]">check_circle</span> Predictive Restock Engine</li>
+                    <li class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[18px]">check_circle</span> Native ERP Sync (SAP, NetSuite)</li>
+                    <li class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[18px]">check_circle</span> 24/7 Dedicated Support & SLA</li>
+                  </ul>
+                </div>
+                <a href="/index.html#dashboard" class="mt-8 w-full py-3 rounded-xl bg-primary-container text-on-primary hover:bg-primary text-center font-label-md text-label-md font-semibold transition-all shadow-md">
+                  Launch Enterprise Free
+                </a>
+              </div>
+
+              <!-- Tier 3: Global Network -->
+              <div class="bg-surface-container-lowest rounded-3xl p-space-lg shadow-sm border border-surface-container-high/40 flex flex-col justify-between hover:shadow-lg transition-all">
+                <div>
+                  <h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface mb-1">Custom Supply Chain</h3>
+                  <p class="font-body-sm text-body-sm text-secondary mb-4">Dedicated cloud tenant & custom hardware gateway integration.</p>
+                  <div class="flex items-baseline gap-1 mb-6">
+                    <span class="font-metric-val text-metric-val font-bold text-on-surface">Custom</span>
+                  </div>
+                  <ul class="space-y-3 font-body-sm text-body-sm text-on-surface-variant">
+                    <li class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[18px]">check_circle</span> On-premise Edge Relay Support</li>
+                    <li class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[18px]">check_circle</span> Automated Forklift Telemetry Sync</li>
+                    <li class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[18px]">check_circle</span> Custom Cryptographic HSM Keys</li>
+                    <li class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[18px]">check_circle</span> Custom Data Retention Policies</li>
+                  </ul>
+                </div>
+                <button onclick="openDemoModal()" class="mt-8 w-full py-3 rounded-xl bg-surface-container text-on-surface hover:bg-surface-container-high text-center font-label-md text-label-md font-semibold transition-all cursor-pointer">
+                  Talk to Solutions Engineer
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 8. BOTTOM HIGH-CONVERSION CTA BANNER -->
+        <section class="w-full px-gutter py-24 bg-surface">
+          <div class="max-w-6xl mx-auto">
+            <div class="bg-inverse-surface rounded-3xl p-space-xl md:p-16 text-inverse-on-surface relative overflow-hidden shadow-2xl">
+              <!-- Orange accent ambient lighting within banner -->
+              <div class="absolute -top-32 -right-32 w-96 h-96 bg-primary-container/20 rounded-full blur-3xl pointer-events-none"></div>
+              <div class="absolute -bottom-32 -left-32 w-96 h-96 bg-primary/20 rounded-full blur-3xl pointer-events-none"></div>
+
+              <div class="relative z-10 max-w-3xl mx-auto text-center">
+                <span class="px-3.5 py-1.5 rounded-full bg-surface-container-lowest/10 font-label-sm text-label-sm text-primary-fixed font-medium inline-block mb-space-md border border-white/10">
+                  Start Free • No Credit Card Required
+                </span>
+                
+                <h2 class="font-display text-display text-white text-3xl sm:text-5xl mb-space-md tracking-tight font-semibold">
+                  Ready to control every movement?
+                </h2>
+                
+                <p class="font-body-lg text-body-lg text-inverse-on-surface/80 mb-space-xl max-w-xl mx-auto text-base sm:text-lg">
+                  Join thousands of logistics leaders who trust StockSense for end-to-end inventory clarity, cryptographic audits, and predictive restock.
+                </p>
+
+                <!-- Inline Email Signup Box -->
+                <form id="cta-form" class="flex flex-col sm:flex-row items-center gap-space-sm max-w-md mx-auto mb-space-md" onsubmit="handleCtaSubmit(event)">
+                  <input id="cta-email" class="w-full px-4 py-3.5 rounded-xl bg-surface-container-lowest text-on-surface placeholder:text-secondary font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary-container shadow-inner" placeholder="Enter your work email" required="" type="email"/>
+                  <button class="w-full sm:w-auto shrink-0 px-6 py-3.5 rounded-xl bg-primary-container text-on-primary font-label-md text-label-md font-semibold hover:bg-primary transition-all shadow-md active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer" type="submit">
+                    <span>Get Started</span>
+                    <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+                  </button>
+                </form>
+
+                <p class="font-label-sm text-label-sm text-inverse-on-surface/60">
+                  Instant self-serve setup. Migrate from CSV, Excel, or existing ERP in under 10 minutes.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="w-full bg-surface-container-lowest border-t border-surface-container-high/40">
+    <div class="max-w-7xl mx-auto px-gutter py-space-xl">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-space-xl mb-space-xl">
+        <div class="lg:col-span-2 flex flex-col items-start gap-space-md">
+          <div class="flex items-center gap-space-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="30" height="30" fill="none">
+              <rect width="48" height="48" rx="14" fill="#FFF1E8"/>
+              <rect x="12" y="12" width="10" height="10" rx="3.5" fill="#F97316"/>
+              <rect x="26" y="12" width="10" height="10" rx="3.5" fill="#F97316" fill-opacity="0.35"/>
+              <rect x="12" y="26" width="10" height="10" rx="3.5" fill="#F97316" fill-opacity="0.7"/>
+              <path d="M26 31C26 28.2386 28.2386 26 31 26H36V31C36 33.7614 33.7614 36 31 36C28.2386 36 26 33.7614 26 31Z" fill="#F97316"/>
+              <path d="M29 31L33 31M33 31L31 29M33 31L31 33" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="font-headline-sm text-headline-sm text-on-surface font-semibold tracking-tight">StockSense</span>
+          </div>
+          <p class="font-body-md text-body-md text-on-surface-variant max-w-sm">
+            Know your stock. Control every movement. The deterministic physical operations platform.
+          </p>
+          <div class="inline-flex items-center gap-space-sm px-space-md py-1 rounded-full bg-surface-container-low border border-surface-container-high/60">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="font-label-sm text-label-sm text-on-surface-variant font-medium">All systems operational</span>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-space-sm">
+          <span class="font-label-sm text-label-sm uppercase text-secondary tracking-wider font-semibold">Platform</span>
+          <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" href="#product">Stock Tracking</a>
+          <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" href="#features">Predictive Restock</a>
+          <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" href="#solutions">Multi-Warehouse</a>
+          <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" href="#pricing">Enterprise SLA</a>
+        </div>
+
+        <div class="flex flex-col gap-space-sm">
+          <span class="font-label-sm text-label-sm uppercase text-secondary tracking-wider font-semibold">Solutions</span>
+          <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" href="#solutions">Boutique Retail</a>
+          <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" href="#solutions">Omnichannel Hubs</a>
+          <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" href="#solutions">3PL Fulfillment</a>
+          <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" href="#solutions">Global Supply Chain</a>
+        </div>
+
+        <div class="flex flex-col gap-space-sm">
+          <span class="font-label-sm text-label-sm uppercase text-secondary tracking-wider font-semibold">Company</span>
+          <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" href="#customers">Customers</a>
+          <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" href="#">Editorial Blog</a>
+          <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" href="#">Careers</a>
+          <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" href="#">Press Kit</a>
+        </div>
+
+        <div class="flex flex-col gap-space-sm">
+          <span class="font-label-sm text-label-sm uppercase text-secondary tracking-wider font-semibold">Resources</span>
+          <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" href="/index.html#dashboard">Interactive Demo</a>
+          <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" href="#">API Docs</a>
+          <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" href="#">Security & Trust</a>
+          <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" href="#">System Status</a>
+        </div>
+      </div>
+
+      <div class="pt-space-lg border-t border-surface-container-high/60 flex flex-col sm:flex-row items-center justify-between gap-space-md">
+        <p class="font-body-sm text-body-sm text-on-surface-variant">© 2025 StockSense Logistics Inc. All rights reserved.</p>
+        <div class="flex items-center gap-space-lg">
+          <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Privacy Policy</a>
+          <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Terms of Service</a>
+          <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Cookie Preferences</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Demo Modal -->
+  <div id="demo-modal" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-surface-container-lowest rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl border border-surface-container-high/60 relative animate-in fade-in duration-200">
+      <button onclick="closeDemoModal()" class="absolute top-5 right-5 text-secondary hover:text-on-surface transition-colors">
+        <span class="material-symbols-outlined text-[24px]">close</span>
+      </button>
+      <div class="w-12 h-12 rounded-2xl bg-primary-fixed text-primary flex items-center justify-center mb-4">
+        <span class="material-symbols-outlined text-[28px]">smart_display</span>
+      </div>
+      <h3 class="font-headline-md text-headline-md font-semibold text-on-surface mb-2">Schedule a Tailored Demo</h3>
+      <p class="font-body-sm text-body-sm text-secondary mb-6">See how StockSense automates receiving, warehouse moves, and replenishment for your volume.</p>
+      
+      <form onsubmit="handleDemoSubmit(event)" class="space-y-4">
+        <div>
+          <label class="font-label-sm text-label-sm text-secondary block mb-1">Work Email</label>
+          <input type="email" required placeholder="alex@company.com" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low text-on-surface outline-none focus:ring-2 focus:ring-primary-container text-body-sm"/>
+        </div>
+        <div>
+          <label class="font-label-sm text-label-sm text-secondary block mb-1">Company Size / Facilities</label>
+          <select class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low text-on-surface outline-none focus:ring-2 focus:ring-primary-container text-body-sm">
+            <option>1 - 2 Facilities (Under 10,000 SKUs)</option>
+            <option>3 - 5 Facilities (10,000 - 50,000 SKUs)</option>
+            <option>6+ Facilities (Enterprise / Global 3PL)</option>
+          </select>
+        </div>
+        <button type="submit" class="w-full py-3 rounded-xl bg-primary-container text-on-primary font-label-md text-label-md font-semibold hover:bg-primary transition-all shadow-md">
+          Request Personalized Demo
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-root" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Interactive Scripts -->
+  <script>
+    function showToast(msg, type = 'success') {
+      const container = document.getElementById('toast-root');
+      if (!container) return;
+      const el = document.createElement('div');
+      const bg = type === 'success' ? 'bg-emerald-600' : 'bg-primary-container';
+      el.className = `toast-popup px-4 py-3 rounded-xl text-white font-body-sm text-body-sm font-medium shadow-lg flex items-center gap-2 ${bg}`;
+      el.innerHTML = `<span class="material-symbols-outlined text-[18px]">check_circle</span><span>${msg}</span>`;
+      container.appendChild(el);
+      setTimeout(() => el.remove(), 3500);
+    }
+
+    function handleCtaSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById('cta-email').value;
+      showToast(`Welcome! Activation dispatched to ${email}`);
+      setTimeout(() => {
+        window.location.href = '/index.html#dashboard';
+      }, 1200);
+    }
+
+    function openDemoModal() {
+      const modal = document.getElementById('demo-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeDemoModal() {
+      const modal = document.getElementById('demo-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function handleDemoSubmit(e) {
+      e.preventDefault();
+      closeDemoModal();
+      showToast('Demo request received! Our engineer will reach out today.');
+    }
+
+    // Live ping simulation
+    setInterval(() => {
+      const ping = document.getElementById('live-ping');
+      if (ping) {
+        const ms = Math.floor(Math.random() * 6) + 11;
+        ping.textContent = ms + 'ms';
+      }
+    }, 4000);
+  </script>
+</body>
+</html>
